@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Контакти – «Цифровий Архів»</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo"><img src="img/logo.png" alt='Логотип "Цифровий Архів"'></a>
+    <button class="mobile-menu-toggle">&#9776;</button>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="index.html">Головна</a></li>
+        <li><a href="catalog.html">Каталог</a></li>
+        <li><a href="about.html">Про нас</a></li>
+        <li><a href="help.html">Допомога</a></li>
+        <li><a href="contact.html" class="active">Контакти</a></li>
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <form class="search-form" action="search.html" method="get">
+        <input type="search" name="q" placeholder="Пошук книг..." aria-label="Пошук книг">
+        <button type="submit">Знайти</button>
+      </form>
+      <div class="auth-links">
+        <a href="profile.html">Вхід</a> / <a href="profile.html">Реєстрація</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <h1>Контактна інформація</h1>
+
+    <h2>Наші координати</h2>
+    <p><strong>Замовник: ТОВ "Освітній Простір"</strong></p>
+    <p><strong>Адреса:</strong> м. Київ, вул. Знань, 1</p>
+    <p><strong>Телефон:</strong> <a href="tel:+380XXXXXXXXX">+380 XX XXX XX XX</a></p>
+    <p><strong>Email:</strong> <a href="mailto:info@osvitniyprostir.example.com">info@osvitniyprostir.example.com</a></p>
+
+    <p><strong>Розробник: ТОВ "ТехноКнига"</strong></p>
+    <p><strong>Адреса:</strong> м. Львів, вул. Розробників, 10</p>
+    <p><strong>Телефон:</strong> <a href="tel:+380XXXXXXXXX">+380 YY YYY YY YY</a></p>
+    <p><strong>Email:</strong> <a href="mailto:support@technoknyga.example.com">support@technoknyga.example.com</a></p>
+
+    <div id="map" class="map-placeholder">
+      Тут буде інтерактивна карта<br>(потрібна інтеграція з Google Maps API)
+    </div>
+
+    <h2>Форма зворотного зв'язку</h2>
+    <p>Маєте запитання або пропозиції? Напишіть нам!</p>
+    <form id="contact-form">
+      <div class="form-group">
+        <label for="name">Ваше ім'я:</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Ваш Email:</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div class="form-group">
+        <label for="subject">Тема повідомлення:</label>
+        <input type="text" id="subject" name="subject">
+      </div>
+      <div class="form-group">
+        <label for="message">Повідомлення:</label>
+        <textarea id="message" name="message" rows="5" required></textarea>
+      </div>
+      <button type="submit" class="btn">Надіслати повідомлення</button>
+    </form>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>&copy; 2025 ТОВ "Освітній Простір". Всі права захищено.</p>
+    <p><a href="#">Політика конфіденційності</a> | <a href="about.html">Про нас</a> | <a href="contact.html">Контакти</a></p>
+  </div>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>

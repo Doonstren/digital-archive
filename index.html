@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Головна – «Цифровий Архів»</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo"><img src="img/logo.png" alt='Логотип "Цифровий Архів"'></a>
+    <button class="mobile-menu-toggle">&#9776;</button>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="index.html" class="active">Головна</a></li>
+        <li><a href="catalog.html">Каталог</a></li>
+        <li><a href="about.html">Про нас</a></li>
+        <li><a href="help.html">Допомога</a></li>
+        <li><a href="contact.html">Контакти</a></li>
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <form class="search-form" action="search.html" method="get">
+        <input type="search" name="q" placeholder="Пошук книг..." aria-label="Пошук книг">
+        <button type="submit">Знайти</button>
+      </form>
+      <div class="auth-links">
+        <a href="profile.html">Вхід</a> / <a href="profile.html">Реєстрація</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <h1>Ласкаво просимо до «Цифрового Архіву»!</h1>
+    <p class="lead">Ваша електронна бібліотека для навчання, досліджень та відпочинку.</p>
+
+    <section>
+      <h2>Нові надходження</h2>
+
+      <div class="book-grid">
+        <article class="book-card">
+          <img src="img/placeholder.jpg" alt="Обкладинка книги 1">
+          <h3>Назва дуже цікавої книги 1</h3>
+          <p class="author">Автор А. Б.</p>
+          <a class="btn" href="book.html">Детальніше</a>
+        </article>
+
+        <article class="book-card">
+          <img src="img/placeholder.jpg" alt="Обкладинка книги 2">
+          <h3>Інша важлива книга</h3>
+          <p class="author">Автор В. Г.</p>
+          <a class="btn" href="book.html">Детальніше</a>
+        </article>
+
+        <article class="book-card">
+          <img src="img/placeholder.jpg" alt="Обкладинка книги 3">
+          <h3>Класика жанру: Том перший</h3>
+          <p class="author">Відомий Класик</p>
+          <a class="btn" href="book.html">Детальніше</a>
+        </article>
+
+        <article class="book-card">
+          <img src="img/placeholder.jpg" alt="Обкладинка книги 4">
+          <h3>Сучасні технології в освіті</h3>
+          <p class="author">Професор П. Р.</p>
+          <a class="btn" href="book.html">Детальніше</a>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Основні категорії</h2>
+      <ul class="category-list">
+        <li><a href="catalog.html?category=it">Інформаційні технології</a></li>
+        <li><a href="catalog.html?category=history">Історія</a></li>
+        <li><a href="catalog.html?category=art">Мистецтво</a></li>
+        <li><a href="catalog.html?category=fiction">Художня література</a></li>
+        <li><a href="catalog.html?category=science">Наука</a></li>
+      </ul>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>&copy; 2025 ТОВ "Освітній Простір". Всі права захищено.</p>
+    <p><a href="#">Політика конфіденційності</a> | <a href="about.html">Про нас</a> | <a href="contact.html">Контакти</a></p>
+  </div>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Назва дуже цікавої книги 1 – «Цифровий Архів»</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo"><img src="img/logo.png" alt='Логотип "Цифровий Архів"'></a>
+    <button class="mobile-menu-toggle">&#9776;</button>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="index.html">Головна</a></li>
+        <li><a href="catalog.html">Каталог</a></li>
+        <li><a href="about.html">Про нас</a></li>
+        <li><a href="help.html">Допомога</a></li>
+        <li><a href="contact.html">Контакти</a></li>
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <form class="search-form" action="search.html" method="get">
+        <input type="search" name="q" placeholder="Пошук книг..." aria-label="Пошук книг">
+        <button type="submit">Знайти</button>
+      </form>
+      <div class="auth-links">
+        <a href="profile.html">Вхід</a> / <a href="profile.html">Реєстрація</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="breadcrumb">
+      <a href="index.html">Головна</a> <span>&raquo;</span>
+      <a href="catalog.html">Каталог</a> <span>&raquo;</span>
+      <span>Назва дуже цікавої книги 1</span>
+    </nav>
+
+    <h1>Назва дуже цікавої книги 1</h1>
+    <p><strong>Автор:</strong> Автор А. Б.</p>
+    <p><strong>Жанр/Категорія:</strong> <a href="catalog.html?category=it">Інформаційні технології</a>, <a href="catalog.html?category=programming">Програмування</a></p>
+    <p><strong>Видавництво:</strong> Видавництво "Знання"</p>
+    <p><strong>Рік видання:</strong> 2024</p>
+    <p><strong>Мова:</strong> Українська</p>
+    <p><strong>Формати:</strong> PDF, EPUB</p>
+
+    <section class="book-actions">
+      <a class="btn read-online-btn" data-book-url="#" href="#">Читати онлайн (EPUB)</a>
+      <a class="btn read-online-btn" data-book-url="#" href="#">Читати онлайн (PDF)</a>
+      <a class="btn download-btn" href="#">Завантажити (PDF)</a>
+      <a class="btn download-btn" href="#">Завантажити (EPUB)</a>
+    </section>
+
+    <section>
+      <h2>Анотація</h2>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+    </section>
+
+    <section>
+      <h2>Схожі книги / Книги цього автора</h2>
+      <ul class="similar-books">
+        <li>
+          <img src="img/placeholder.jpg" alt="Обкладинка">
+          <span>Вступ до програмування – Доцент Д. Е.</span>
+        </li>
+        <li>
+          <img src="img/placeholder.jpg" alt="Обкладинка">
+          <span>Інша важлива книга – Автор В. Г.</span>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Відгуки читачів (0)</h2>
+      <form class="review-form">
+        <textarea rows="4" placeholder="Залиште свій відгук..." required></textarea>
+        <button class="btn" type="submit">Надіслати</button>
+      </form>
+      <div class="reviews">
+        <!-- Тут з'являться відгуки -->
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>&copy; 2025 ТОВ "Освітній Простір". Всі права захищено.</p>
+    <p><a href="#">Політика конфіденційності</a> | <a href="about.html">Про нас</a> | <a href="contact.html">Контакти</a></p>
+  </div>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Каталог – «Цифровий Архів»</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo"><img src="img/logo.png" alt='Логотип "Цифровий Архів"'></a>
+    <button class="mobile-menu-toggle">&#9776;</button>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="index.html">Головна</a></li>
+        <li><a href="catalog.html" class="active">Каталог</a></li>
+        <li><a href="about.html">Про нас</a></li>
+        <li><a href="help.html">Допомога</a></li>
+        <li><a href="contact.html">Контакти</a></li>
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <form class="search-form" action="search.html" method="get">
+        <input type="search" name="q" placeholder="Пошук книг..." aria-label="Пошук книг">
+        <button type="submit">Знайти</button>
+      </form>
+      <div class="auth-links">
+        <a href="profile.html">Вхід</a> / <a href="profile.html">Реєстрація</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <h1>Каталог книг</h1>
+
+    <aside class="filters">
+      <h2>Фільтри</h2>
+
+      <div class="filter-block">
+        <h3>Категорії/Жанри</h3>
+        <ul class="filter-list">
+          <li><a href="?category=it">Інформаційні технології</a></li>
+          <li><a href="?category=history">Історія</a>
+            <ul>
+              <li><a href="?category=ukr_history">Історія України</a></li>
+              <li><a href="?category=world_history">Світова історія</a></li>
+            </ul>
+          </li>
+          <li><a href="?category=art">Мистецтво</a></li>
+          <li><a href="?category=fiction">Художня література</a></li>
+          <li><a href="?category=science">Наука</a></li>
+        </ul>
+      </div>
+
+      <div class="filter-block">
+        <h3>Автор</h3>
+        <input type="text" placeholder="Пошук автора">
+      </div>
+
+      <div class="filter-block">
+        <h3>Рік видання</h3>
+        <label>Від: <input type="number" min="1800" max="2025" placeholder="1900"></label>
+        <label>До: <input type="number" min="1800" max="2025" placeholder="2025"></label>
+      </div>
+
+      <div class="filter-block">
+        <h3>Сортування</h3>
+        <select>
+          <option>За популярністю</option>
+          <option>За назвою (А-Я)</option>
+          <option>За назвою (Я-А)</option>
+          <option>За датою додавання</option>
+        </select>
+      </div>
+    </aside>
+
+    <section class="catalog-content">
+      <h2>Список книг</h2>
+
+      <div class="book-list">
+        <article>
+          <h3>1. Назва дуже цікавої книги 1</h3>
+          <p>Автор: Автор А. Б.</p>
+          <a class="btn" href="book.html">Детальніше</a>
+        </article>
+
+        <article>
+          <h3>2. Інша важлива книга</h3>
+          <p>Автор: Автор В. Г.</p>
+          <a class="btn" href="book.html">Детальніше</a>
+        </article>
+
+        <article>
+          <h3>3. Класика жанру: Том перший</h3>
+          <p>Автор: Відомий Класик</p>
+          <a class="btn" href="book.html">Детальніше</a>
+        </article>
+
+        <article>
+          <h3>4. Сучасні технології в освіті</h3>
+          <p>Автор: Професор П. Р.</p>
+          <a class="btn" href="book.html">Детальніше</a>
+        </article>
+
+        <article>
+          <h3>5. Вступ до програмування</h3>
+          <p>Автор: Доцент Д. Е.</p>
+          <a class="btn" href="book.html">Детальніше</a>
+        </article>
+
+        <article>
+          <h3>6. Історія мистецтва XX століття</h3>
+          <p>Автор: Мистецтвознавець Ж. З.</p>
+          <a class="btn" href="book.html">Детальніше</a>
+        </article>
+      </div>
+
+      <nav class="pagination">
+        <a class="active" href="#">1</a>
+        <a href="#">2</a>
+        <a href="#">3</a> … 
+        <a href="#">10</a>
+        <a href="#" class="next">Наступна</a>
+      </nav>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>&copy; 2025 ТОВ "Освітній Простір". Всі права захищено.</p>
+    <p><a href="#">Політика конфіденційності</a> | <a href="about.html">Про нас</a> | <a href="contact.html">Контакти</a></p>
+  </div>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>
