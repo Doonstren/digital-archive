@@ -463,6 +463,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sendMessageBtn = document.getElementById('sendMessageBtn');
             const vercelProxyUrl = 'https://digital-archive-proxy-doonstrens-projects.vercel.app/api/gemini';
             
+            const bookContextString = JSON.stringify(bookDatabase.map(b => ({
+                id: b.id,
+                title: b.title,
+                author: b.author,
+                annotation: b.annotation,
+                categories: b.categories
+            })));
+
+            const systemInstruction = {
+                role: 'user',
+                parts: [{ text: `You are a creative and conversational Ukrainian-speaking library assistant named "Нейро-Бібліотекар". Your task is to analyze the user's request, the provided chat history, and the book database. Your response MUST be a valid JSON object. This is the list of available books in JSON format: ${bookContextString}. RULES: 1. If you find relevant books, your response MUST be a JSON object with a "recommendations" key. The value should be an array of objects. Each object MUST contain two keys: - "id": The ID of the book from the provided list. - "recommendation_text": A NEW, ORIGINAL, and engaging description (2-4 sentences in Ukrainian) explaining WHY this book is a good match for the user's request. DO NOT simply copy the annotation. Be creative, like a real librarian giving a personal recommendation. 2. If you cannot find any relevant books, or if the user is just greeting you or asking a general question, your response MUST be a JSON object with a "conversation" key. The value should be a friendly, helpful message in Ukrainian.` }]
+            };
+            
             let chatHistory = [];
 
             const addMessageToChat = (text, sender, isHtml = false) => {
@@ -489,32 +502,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <a href="book.html?id=${book.id}" class="btn" target="_blank">Детальніше</a>
                     </div>`;
             };
-            
-            const constructGeminiPrompt = (userQuery) => {
-                const bookContextString = JSON.stringify(bookDatabase.map(b => ({
-                    id: b.id,
-                    title: b.title,
-                    author: b.author,
-                    annotation: b.annotation,
-                    categories: b.categories
-                })));
-
-                return `You are a creative and conversational Ukrainian-speaking library assistant named "Нейро-Бібліотекар". Your task is to analyze the user's request, the provided chat history, and the book database. Your response MUST be a valid JSON object.
-                
-                This is the list of available books in JSON format:
-                ${bookContextString}
-
-                The user's new request is: "${userQuery}"
-
-                RULES:
-                1. If you find relevant books based on the user's request AND chat history, your response MUST be a JSON object with a "recommendations" key. The value should be an array of objects.
-                   Each object MUST contain two keys:
-                   - "id": The ID of the book from the provided list.
-                   - "recommendation_text": A NEW, ORIGINAL, and engaging description (2-4 sentences in Ukrainian) explaining WHY this book is a good match for the user's request. DO NOT simply copy the annotation. Be creative, like a real librarian giving a personal recommendation.
-                
-                2. If you cannot find any relevant books, or if the user is just greeting you or asking a general question, your response MUST be a JSON object with a "conversation" key. The value should be a friendly, helpful message in Ukrainian.
-                `;
-            };
 
             const handleSendMessage = async () => {
                 const userText = chatInput.value.trim();
@@ -524,19 +511,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 chatInput.value = '';
                 sendMessageBtn.disabled = true;
                 
-                chatHistory.push({
-                    role: 'user',
-                    parts: [{ text: userText }]
-                });
+                chatHistory.push({ role: 'user', parts: [{ text: userText }] });
 
                 const loadingMessage = addMessageToChat('Аналізую ваш запит...', 'ai');
-                const prompt = constructGeminiPrompt(userText);
                 
                 try {
+                    const payload = {
+                        history: [systemInstruction, ...chatHistory]
+                    };
+                    
                     const response = await fetch(vercelProxyUrl, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ prompt: prompt, history: chatHistory.slice(0, -1) }) // Отправляем историю без последнего запроса
+                        body: JSON.stringify(payload)
                     });
                     
                     if (!response.ok) throw new Error(`HTTP помилка! Статус: ${response.status}`);
@@ -581,6 +568,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     loadingMessage.remove();
                     addMessageToChat(`Вибачте, сталася помилка. Спробуйте, будь ласка, пізніше. (${error.message})`, 'ai');
                     console.error('Error fetching from Gemini proxy:', error);
+                    chatHistory.pop(); // Удаляем последний запрос пользователя из истории, так как он привел к ошибке
                 }
 
                 sendMessageBtn.disabled = false;
