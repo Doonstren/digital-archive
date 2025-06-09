@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     `;
                 }
                 
-                pdfContainer.style.display = 'block';
+                if (pdfContainer) pdfContainer.style.display = 'block';
 
                 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js`;
 
@@ -288,8 +288,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                         canvas.height = viewport.height;
                         canvas.width = viewport.width;
 
-                        viewer.innerHTML = '';
-                        viewer.appendChild(canvas);
+                        if (viewer) {
+                            viewer.innerHTML = '';
+                            viewer.appendChild(canvas);
+                        }
                         
                         const renderContext = {
                             canvasContext: context,
@@ -305,7 +307,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             }
                         });
                     });
-                    pageNumEl.textContent = num;
+                    if (pageNumEl) pageNumEl.textContent = num;
                 }
 
                 function queueRenderPage(num) {
@@ -316,13 +318,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 }
 
-                document.getElementById('prev-page').addEventListener('click', () => {
+                document.getElementById('prev-page')?.addEventListener('click', () => {
                     if (pageNum <= 1) return;
                     pageNum--;
                     queueRenderPage(pageNum);
                 });
 
-                document.getElementById('next-page').addEventListener('click', () => {
+                document.getElementById('next-page')?.addEventListener('click', () => {
                     if (pageNum >= pdfDoc.numPages) return;
                     pageNum++;
                     queueRenderPage(pageNum);
@@ -330,18 +332,146 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 pdfjsLib.getDocument(book.filePathPDF).promise.then(function(pdfDoc_) {
                     pdfDoc = pdfDoc_;
-                    pageCountEl.textContent = pdfDoc.numPages;
-                    loader.style.display = 'none';
+                    if (pageCountEl) pageCountEl.textContent = pdfDoc.numPages;
+                    if (loader) loader.style.display = 'none';
                     renderPage(pageNum);
                 }).catch(function(error) {
                     console.error('Error loading PDF:', error);
-                    loader.textContent = 'Помилка завантаження PDF-файлу.';
+                    if (loader) loader.textContent = 'Помилка завантаження PDF-файлу.';
                 });
 
             } else {
-                loader.textContent = 'Помилка: файл книги не знайдено.';
+                if (loader) loader.textContent = 'Помилка: файл книги не знайдено.';
             }
         }
         
+        if (currentPath === 'catalog.html') {
+            const bookGrid = document.getElementById('catalog-book-grid');
+            const paginationContainer = document.getElementById('pagination-container');
+            const booksFoundCount = document.getElementById('books-found-count');
+            const categoryList = document.getElementById('category-filter-list');
+            const catalogTitle = document.getElementById('catalog-title');
+
+            let currentPage = 1;
+            const itemsPerPage = 12;
+            let filteredBooks = [...bookDatabase];
+            
+            const categoryMap = { it: "IT", programming: "Програмування", fiction: "Художня література", 'sci-fi': "Наукова фантастика", dystopia: "Антиутопія", science: "Наука", history: "Історія", fantasy: "Фентезі", psychology: "Психологія", 'self-help': "Саморозвиток", biography: "Біографії", philosophy: "Філософія", classics: "Класика", thriller: "Трилери", ukrainian: "Українська література" };
+
+            const allCategories = [...new Set(bookDatabase.flatMap(b => b.categories))];
+            if(categoryList) {
+                categoryList.innerHTML = `<li><a href="#" class="filter-category-link active" data-category="all">Всі категорії</a></li>` +
+                    allCategories.sort().map(cat => `<li><a href="#" class="filter-category-link" data-category="${cat}">${categoryMap[cat] || cat}</a></li>`).join('');
+            }
+
+            const applyFiltersAndRender = () => {
+                const category = document.querySelector('.filter-category-link.active')?.dataset.category || 'all';
+                const authorQuery = document.getElementById('author-filter').value.toLowerCase();
+                const yearFrom = parseInt(document.getElementById('year-from-filter').value) || 0;
+                const yearTo = parseInt(document.getElementById('year-to-filter').value) || 9999;
+                const sortOrder = document.getElementById('sort-order').value;
+
+                filteredBooks = bookDatabase.filter(book => {
+                    const categoryMatch = category === 'all' || book.categories.includes(category);
+                    const authorMatch = !authorQuery || book.author.toLowerCase().includes(authorQuery);
+                    const yearMatch = book.year >= yearFrom && book.year <= yearTo;
+                    return categoryMatch && authorMatch && yearMatch;
+                });
+                
+                switch (sortOrder) {
+                    case 'title_asc': filteredBooks.sort((a,b) => a.title.localeCompare(b.title)); break;
+                    case 'title_desc': filteredBooks.sort((a,b) => b.title.localeCompare(a.title)); break;
+                    case 'year_desc': filteredBooks.sort((a,b) => b.year - a.year); break;
+                    case 'year_asc': filteredBooks.sort((a,b) => a.year - b.year); break;
+                    case 'popularity': filteredBooks.sort((a,b) => b.votes - a.votes); break;
+                }
+
+                currentPage = 1;
+                renderPage(currentPage);
+            };
+            
+            const renderPage = (page) => {
+                if(booksFoundCount) booksFoundCount.textContent = `Знайдено ${filteredBooks.length} книг`;
+                
+                const start = (page - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+                const paginatedBooks = filteredBooks.slice(start, end);
+                
+                if(bookGrid) bookGrid.innerHTML = paginatedBooks.map(renderBookCard).join('');
+                renderPagination();
+            };
+
+            const renderPagination = () => {
+                if(!paginationContainer) return;
+                const pageCount = Math.ceil(filteredBooks.length / itemsPerPage);
+                paginationContainer.innerHTML = '';
+                if (pageCount <= 1) return;
+
+                const createButton = (text, pageNum, isDisabled = false, isActive = false) => {
+                    const btn = document.createElement('button');
+                    btn.textContent = text;
+                    if (pageNum) btn.dataset.page = pageNum;
+                    if (isDisabled) btn.disabled = true;
+                    if (isActive) btn.classList.add('active');
+                    return btn;
+                };
+
+                paginationContainer.appendChild(createButton('«', currentPage - 1, currentPage === 1));
+
+                let addedEllipsis = false;
+                for (let i = 1; i <= pageCount; i++) {
+                     if (i === 1 || i === pageCount || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                        paginationContainer.appendChild(createButton(i, i, false, i === currentPage));
+                        addedEllipsis = false;
+                    } else if (!addedEllipsis) {
+                        const span = document.createElement('span');
+                        span.textContent = '...';
+                        paginationContainer.appendChild(span);
+                        addedEllipsis = true;
+                    }
+                }
+
+                paginationContainer.appendChild(createButton('»', currentPage + 1, currentPage === pageCount));
+            };
+            
+            if(paginationContainer) {
+                paginationContainer.addEventListener('click', e => {
+                    if (e.target.tagName === 'BUTTON' && !e.target.disabled && e.target.dataset.page) {
+                        currentPage = parseInt(e.target.dataset.page);
+                        renderPage(currentPage);
+                        window.scrollTo(0, 0);
+                    }
+                });
+            }
+            
+            if(categoryList) {
+                categoryList.addEventListener('click', e => {
+                    e.preventDefault();
+                    if (e.target.classList.contains('filter-category-link')) {
+                        document.querySelector('.filter-category-link.active')?.classList.remove('active');
+                        e.target.classList.add('active');
+                        const categoryName = e.target.dataset.category === 'all' ? 'Каталог книг' : `Категорія: ${e.target.textContent}`;
+                        if(catalogTitle) catalogTitle.textContent = categoryName;
+                        applyFiltersAndRender();
+                    }
+                });
+            }
+
+            document.getElementById('apply-filters-btn')?.addEventListener('click', applyFiltersAndRender);
+            
+            document.getElementById('reset-filters-btn')?.addEventListener('click', () => {
+                document.querySelector('.filter-category-link.active')?.classList.remove('active');
+                const allCatLink = document.querySelector('.filter-category-link[data-category="all"]');
+                if(allCatLink) allCatLink.classList.add('active');
+                document.getElementById('author-filter').value = '';
+                document.getElementById('year-from-filter').value = '';
+                document.getElementById('year-to-filter').value = '';
+                document.getElementById('sort-order').value = 'popularity';
+                if(catalogTitle) catalogTitle.textContent = 'Каталог книг';
+                applyFiltersAndRender();
+            });
+            
+            applyFiltersAndRender();
+        }
     }
 });
