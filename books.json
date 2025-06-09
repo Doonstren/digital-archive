@@ -1,7 +1,7 @@
 [
     {
         "id": "clean-code",
-        "title": "Чистий код: Створення та рефакторинг",
+        "title": "Чистий код",
         "author": "Роберт Мартін",
         "year": 2021,
         "categories": ["it", "programming"],
