@@ -112,25 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     categories: b.categories
                 })));
 
-                return `You are a creative and conversational Ukrainian-speaking library assistant named "Нейро-Бібліотекар".
-                Your task is to analyze the user's request and the provided book database.
-                Your response MUST be a valid JSON object.
-
-                This is the list of available books in JSON format:
-                ${bookContextString}
-
-                The user's request is: "${userQuery}"
-
-                RULES:
-                1. If you find relevant books, your response MUST be a JSON object with a "recommendations" key. The value should be an array of objects.
-                   Each object MUST contain two keys:
-                   - "id": The ID of the book from the provided list.
-                   - "recommendation_text": A NEW, ORIGINAL, and engaging description (2-4 sentences in Ukrainian) explaining WHY this book is a good match for the user's request. DO NOT simply copy the annotation. Be creative, like a real librarian giving a personal recommendation.
-                   Example: {"recommendations": [{"id": "dune", "recommendation_text": "Оскільки ви шукали епічну фантастику, 'Дюна' – це саме те, що треба! Це не просто книга, а цілий всесвіт з глибокою політикою, філософією та незабутньою атмосферою пустельної планети. Вона змусить вас замислитись."}]}
-                
-                2. If you cannot find any relevant books, or if the user is just greeting you or asking a general question, your response MUST be a JSON object with a "conversation" key. The value should be a friendly, helpful message in Ukrainian.
-                   Example: {"conversation": "Вітаю! Радий допомогти вам у пошуку ідеальної книги. Що вас цікавить сьогодні?"}
-                `;
+                return `You are a creative and conversational Ukrainian-speaking library assistant named "Нейро-Бібліотекар". Your task is to analyze the user's request and the provided book database. Your response MUST be a valid JSON object. This is the list of available books in JSON format: ${bookContextString} The user's request is: "${userQuery}" RULES: 1. If you find relevant books, your response MUST be a JSON object with a "recommendations" key. The value should be an array of objects. Each object MUST contain two keys: - "id": The ID of the book from the provided list. - "recommendation_text": A NEW, ORIGINAL, and engaging description (2-4 sentences in Ukrainian) explaining WHY this book is a good match for the user's request. DO NOT simply copy the annotation. Be creative, like a real librarian giving a personal recommendation. Example: {"recommendations": [{"id": "dune", "recommendation_text": "Оскільки ви шукали епічну фантастику, 'Дюна' – це саме те, що треба! Це не просто книга, а цілий всесвіт з глибокою політикою, філософією та незабутньою атмосферою пустельної планети. Вона змусить вас замислитись."}]} 2. If you cannot find any relevant books, or if the user is just greeting you or asking a general question, your response MUST be a JSON object with a "conversation" key. The value should be a friendly, helpful message in Ukrainian. Example: {"conversation": "Вітаю! Радий допомогти вам у пошуку ідеальної книги. Що вас цікавить сьогодні?"}`;
             };
 
             const handleSendMessage = async () => {
@@ -200,57 +182,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         
-        if (currentPath === 'profile.html') {
-            const showLoginBtn = document.getElementById('show-login');
-            const showRegisterBtn = document.getElementById('show-register');
-            const loginForm = document.getElementById('login-form');
-            const registerForm = document.getElementById('register-form');
-
-            if (showLoginBtn && showRegisterBtn && loginForm && registerForm) {
-                showLoginBtn.addEventListener('click', () => {
-                    loginForm.classList.remove('hidden');
-                    registerForm.classList.add('hidden');
-                    showLoginBtn.classList.add('active');
-                    showRegisterBtn.classList.remove('active');
-                });
-
-                showRegisterBtn.addEventListener('click', () => {
-                    loginForm.classList.add('hidden');
-                    registerForm.classList.remove('hidden');
-                    showLoginBtn.classList.remove('active');
-                    showRegisterBtn.classList.add('active');
-                });
-                
-                const loginMessage = document.getElementById('login-message');
-                loginForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    loginMessage.textContent = 'Обробка...';
-                    loginMessage.className = 'form-message';
-                    await new Promise(res => setTimeout(res, 500));
-                    loginMessage.textContent = 'Вхід успішний! Перенаправлення...';
-                    loginMessage.classList.add('success');
-                    setTimeout(() => window.location.href = 'index.html', 1500);
-                });
-                
-                const registerMessage = document.getElementById('register-message');
-                registerForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    registerMessage.textContent = 'Реєстрація...';
-                    registerMessage.className = 'form-message';
-                    if (registerForm.registerPassword.value !== registerForm.registerPasswordConfirm.value) {
-                        registerMessage.textContent = 'Паролі не співпадають.';
-                        registerMessage.classList.add('error');
-                        return;
-                    }
-                    await new Promise(res => setTimeout(res, 500));
-                    registerMessage.textContent = 'Реєстрація успішна! Тепер ви можете увійти.';
-                    registerMessage.classList.add('success');
-                    registerForm.reset();
-                    setTimeout(() => showLoginBtn.click(), 1500);
-                });
-            }
-        }
-
         if (currentPath === 'book.html') {
             const params = new URLSearchParams(window.location.search);
             const bookId = params.get('id');
@@ -277,11 +208,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('book-annotation-text').innerHTML = `<p>${book.annotation.replace(/\n/g, '</p><p>')}</p>`;
                 document.getElementById('book-cover-img').src = book.coverUrl;
                 document.getElementById('book-cover-img').alt = `Обкладинка ${book.title}`;
-                document.getElementById('book-formats-list').textContent = book.formats;
-
+                
                 const categoryMap = { it: "IT", programming: "Програмування", fiction: "Художня література", 'sci-fi': "Наукова фантастика", dystopia: "Антиутопія", science: "Наука", history: "Історія", fantasy: "Фентезі", psychology: "Психологія", 'self-help': "Саморозвиток", biography: "Біографії", philosophy: "Філософія", classics: "Класика", thriller: "Трилери", ukrainian: "Українська література" };
                 const genreTagsContainer = document.getElementById('book-genre-tags');
-                genreTagsContainer.innerHTML = book.categories.map(cat => `<a href="catalog.html?category=${cat}">${categoryMap[cat] || cat}</a>`).join(' ');
+                if (genreTagsContainer) {
+                    genreTagsContainer.innerHTML = book.categories.map(cat => `<a href="catalog.html?category=${cat}">${categoryMap[cat] || cat}</a>`).join(' ');
+                }
+
+                const actionsContainer = document.getElementById('book-actions-container');
+                if(actionsContainer && book.filePathPDF) {
+                    actionsContainer.innerHTML = '';
+                    actionsContainer.innerHTML += `<a class="btn" href="reader.html?bookId=${book.id}">Читати онлайн</a>`;
+                    actionsContainer.innerHTML += `<a class="btn btn-secondary" href="${book.filePathPDF}" download>Завантажити PDF</a>`;
+                }
 
                 const similarBooksGrid = document.getElementById('similar-books-grid');
                 const similarBooks = bookDatabase
@@ -303,186 +242,106 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
         
-        if(currentPath === 'search.html') {
+        if (currentPath === 'reader.html') {
             const params = new URLSearchParams(window.location.search);
-            const query = params.get('q');
+            const bookId = params.get('bookId');
+            const book = bookDatabase.find(b => b.id === bookId);
+
+            const titleHeader = document.getElementById('book-title-header');
+            const bookInfoWrapper = document.getElementById('book-info-wrapper');
+            const loader = document.getElementById('loader');
+            const pdfContainer = document.getElementById('pdf-container');
             
-            const titleEl = document.getElementById('search-results-title');
-            const resultsGrid = document.getElementById('search-results-grid');
-            const noResultsDiv = document.getElementById('search-no-results');
-            const searchInput = document.getElementById('header-search-input');
-            
-            if (searchInput) searchInput.value = query || '';
-            
-            if (!query) {
-                if(titleEl) titleEl.textContent = 'Будь ласка, введіть пошуковий запит';
-                return;
-            }
-            
-            if(titleEl) titleEl.textContent = `Результати пошуку: “${query}”`;
-            
-            const lowerQuery = query.toLowerCase();
-            const foundBooks = bookDatabase.filter(book => 
-                book.title.toLowerCase().includes(lowerQuery) ||
-                book.author.toLowerCase().includes(lowerQuery)
-            );
-            
-            if (foundBooks.length > 0) {
-                if(resultsGrid) resultsGrid.innerHTML = foundBooks.map(renderBookCard).join('');
-                if(noResultsDiv) noResultsDiv.classList.add('hidden');
+            if (book && book.filePathPDF) {
+                document.title = `${book.title} – Читалка`;
+                if(titleHeader) titleHeader.textContent = book.title;
+
+                if(bookInfoWrapper) {
+                    bookInfoWrapper.innerHTML = `
+                        <img src="${book.coverUrl}" alt="Обкладинка ${book.title}">
+                        <h2>${book.title}</h2>
+                        <p>${book.author}</p>
+                    `;
+                }
+                
+                pdfContainer.style.display = 'block';
+
+                pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js`;
+
+                let pdfDoc = null,
+                    pageNum = 1,
+                    pageRendering = false,
+                    pageNumPending = null,
+                    scale = 1.5;
+
+                const viewer = document.getElementById('pdf-viewer');
+                const pageNumEl = document.getElementById('page-num');
+                const pageCountEl = document.getElementById('page-count');
+
+                function renderPage(num) {
+                    pageRendering = true;
+                    pdfDoc.getPage(num).then(function(page) {
+                        const viewport = page.getViewport({ scale: scale });
+                        
+                        const canvas = document.createElement('canvas');
+                        const context = canvas.getContext('2d');
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+
+                        viewer.innerHTML = '';
+                        viewer.appendChild(canvas);
+                        
+                        const renderContext = {
+                            canvasContext: context,
+                            viewport: viewport
+                        };
+                        const renderTask = page.render(renderContext);
+
+                        renderTask.promise.then(function() {
+                            pageRendering = false;
+                            if (pageNumPending !== null) {
+                                renderPage(pageNumPending);
+                                pageNumPending = null;
+                            }
+                        });
+                    });
+                    pageNumEl.textContent = num;
+                }
+
+                function queueRenderPage(num) {
+                    if (pageRendering) {
+                        pageNumPending = num;
+                    } else {
+                        renderPage(num);
+                    }
+                }
+
+                document.getElementById('prev-page').addEventListener('click', () => {
+                    if (pageNum <= 1) return;
+                    pageNum--;
+                    queueRenderPage(pageNum);
+                });
+
+                document.getElementById('next-page').addEventListener('click', () => {
+                    if (pageNum >= pdfDoc.numPages) return;
+                    pageNum++;
+                    queueRenderPage(pageNum);
+                });
+
+                pdfjsLib.getDocument(book.filePathPDF).promise.then(function(pdfDoc_) {
+                    pdfDoc = pdfDoc_;
+                    pageCountEl.textContent = pdfDoc.numPages;
+                    loader.style.display = 'none';
+                    renderPage(pageNum);
+                }).catch(function(error) {
+                    console.error('Error loading PDF:', error);
+                    loader.textContent = 'Помилка завантаження PDF-файлу.';
+                });
+
             } else {
-                if(resultsGrid) resultsGrid.innerHTML = '';
-                const querySpan = document.getElementById('searched-query-no-results');
-                if (querySpan) querySpan.textContent = query;
-                if(noResultsDiv) noResultsDiv.classList.remove('hidden');
+                loader.textContent = 'Помилка: файл книги не знайдено.';
             }
         }
         
-        if (currentPath === 'catalog.html') {
-            const bookGrid = document.getElementById('catalog-book-grid');
-            const paginationContainer = document.getElementById('pagination-container');
-            const booksFoundCount = document.getElementById('books-found-count');
-            const categoryList = document.getElementById('category-filter-list');
-            const catalogTitle = document.getElementById('catalog-title');
-
-            let currentPage = 1;
-            const itemsPerPage = 12;
-            let filteredBooks = [...bookDatabase];
-            
-            const categoryMap = { it: "IT", programming: "Програмування", fiction: "Художня література", 'sci-fi': "Наукова фантастика", dystopia: "Антиутопія", science: "Наука", history: "Історія", fantasy: "Фентезі", psychology: "Психологія", 'self-help': "Саморозвиток", biography: "Біографії", philosophy: "Філософія", classics: "Класика", thriller: "Трилери", ukrainian: "Українська література" };
-
-            const allCategories = [...new Set(bookDatabase.flatMap(b => b.categories))];
-            if(categoryList) {
-                categoryList.innerHTML = `<li><a href="#" class="filter-category-link active" data-category="all">Всі категорії</a></li>` +
-                    allCategories.sort().map(cat => `<li><a href="#" class="filter-category-link" data-category="${cat}">${categoryMap[cat] || cat}</a></li>`).join('');
-            }
-
-            const applyFiltersAndRender = () => {
-                const category = document.querySelector('.filter-category-link.active')?.dataset.category || 'all';
-                const authorQuery = document.getElementById('author-filter').value.toLowerCase();
-                const yearFrom = parseInt(document.getElementById('year-from-filter').value) || 0;
-                const yearTo = parseInt(document.getElementById('year-to-filter').value) || 9999;
-                const sortOrder = document.getElementById('sort-order').value;
-
-                filteredBooks = bookDatabase.filter(book => {
-                    const categoryMatch = category === 'all' || book.categories.includes(category);
-                    const authorMatch = !authorQuery || book.author.toLowerCase().includes(authorQuery);
-                    const yearMatch = book.year >= yearFrom && book.year <= yearTo;
-                    return categoryMatch && authorMatch && yearMatch;
-                });
-                
-                switch (sortOrder) {
-                    case 'title_asc': filteredBooks.sort((a,b) => a.title.localeCompare(b.title)); break;
-                    case 'title_desc': filteredBooks.sort((a,b) => b.title.localeCompare(a.title)); break;
-                    case 'year_desc': filteredBooks.sort((a,b) => b.year - a.year); break;
-                    case 'year_asc': filteredBooks.sort((a,b) => a.year - b.year); break;
-                    case 'popularity': filteredBooks.sort((a,b) => b.votes - a.votes); break;
-                }
-
-                currentPage = 1;
-                renderPage(currentPage);
-            };
-            
-            const renderPage = (page) => {
-                if(booksFoundCount) booksFoundCount.textContent = `Знайдено ${filteredBooks.length} книг`;
-                
-                const start = (page - 1) * itemsPerPage;
-                const end = start + itemsPerPage;
-                const paginatedBooks = filteredBooks.slice(start, end);
-                
-                if(bookGrid) bookGrid.innerHTML = paginatedBooks.map(renderBookCard).join('');
-                renderPagination();
-            };
-
-            const renderPagination = () => {
-                if(!paginationContainer) return;
-                const pageCount = Math.ceil(filteredBooks.length / itemsPerPage);
-                paginationContainer.innerHTML = '';
-                if (pageCount <= 1) return;
-
-                const createButton = (text, pageNum, isDisabled = false, isActive = false) => {
-                    const btn = document.createElement('button');
-                    btn.textContent = text;
-                    if (pageNum) btn.dataset.page = pageNum;
-                    if (isDisabled) btn.disabled = true;
-                    if (isActive) btn.classList.add('active');
-                    return btn;
-                };
-
-                paginationContainer.appendChild(createButton('«', currentPage - 1, currentPage === 1));
-
-                let addedEllipsis = false;
-                for (let i = 1; i <= pageCount; i++) {
-                     if (i === 1 || i === pageCount || (i >= currentPage - 2 && i <= currentPage + 2)) {
-                        paginationContainer.appendChild(createButton(i, i, false, i === currentPage));
-                        addedEllipsis = false;
-                    } else if (!addedEllipsis) {
-                        const span = document.createElement('span');
-                        span.textContent = '...';
-                        paginationContainer.appendChild(span);
-                        addedEllipsis = true;
-                    }
-                }
-
-                paginationContainer.appendChild(createButton('»', currentPage + 1, currentPage === pageCount));
-            };
-            
-            if(paginationContainer) {
-                paginationContainer.addEventListener('click', e => {
-                    if (e.target.tagName === 'BUTTON' && !e.target.disabled && e.target.dataset.page) {
-                        currentPage = parseInt(e.target.dataset.page);
-                        renderPage(currentPage);
-                        window.scrollTo(0, 0);
-                    }
-                });
-            }
-            
-            if(categoryList) {
-                categoryList.addEventListener('click', e => {
-                    e.preventDefault();
-                    if (e.target.classList.contains('filter-category-link')) {
-                        document.querySelector('.filter-category-link.active')?.classList.remove('active');
-                        e.target.classList.add('active');
-                        const categoryName = e.target.dataset.category === 'all' ? 'Каталог книг' : `Категорія: ${e.target.textContent}`;
-                        if(catalogTitle) catalogTitle.textContent = categoryName;
-                        applyFiltersAndRender();
-                    }
-                });
-            }
-
-            document.getElementById('apply-filters-btn')?.addEventListener('click', applyFiltersAndRender);
-            
-            document.getElementById('reset-filters-btn')?.addEventListener('click', () => {
-                document.querySelector('.filter-category-link.active')?.classList.remove('active');
-                const allCatLink = document.querySelector('.filter-category-link[data-category="all"]');
-                if(allCatLink) allCatLink.classList.add('active');
-                document.getElementById('author-filter').value = '';
-                document.getElementById('year-from-filter').value = '';
-                document.getElementById('year-to-filter').value = '';
-                document.getElementById('sort-order').value = 'popularity';
-                if(catalogTitle) catalogTitle.textContent = 'Каталог книг';
-                applyFiltersAndRender();
-            });
-            
-            applyFiltersAndRender();
-        }
-
-        if (currentPath === 'contact.html') {
-            const contactForm = document.getElementById('contactForm');
-            if (contactForm) {
-                contactForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const msgEl = document.getElementById('contactFormMessage');
-                    if(msgEl) {
-                        msgEl.textContent = 'Відправлення...';
-                        msgEl.className = 'form-message';
-                        await new Promise(res => setTimeout(res, 500));
-                        msgEl.textContent = 'Дякуємо! Ваше повідомлення надіслано.';
-                        msgEl.classList.add('success');
-                    }
-                    contactForm.reset();
-                });
-            }
-        }
     }
 });

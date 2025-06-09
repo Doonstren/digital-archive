@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Читалка – «Цифровий Архів»</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: #f0f0f0;
+        }
+        .reader-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .reader-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background-color: var(--bg-alt-color);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            color: var(--text-color);
+        }
+        .reader-header a {
+            font-size: 1.2rem;
+            text-decoration: none;
+        }
+        .reader-header h1 {
+            font-size: 1.1rem;
+            margin: 0;
+            text-align: center;
+        }
+        .reader-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .reader-controls button, .reader-controls span {
+            font-size: 1rem;
+        }
+        .reader-controls button {
+            background: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+        }
+        .reader-controls button:hover {
+            background-color: #ddd;
+        }
+        .reader-main {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-y: auto;
+            padding: 2rem 1rem;
+        }
+        #pdf-viewer {
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        #pdf-viewer canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        #loader {
+            text-align: center;
+            padding: 4rem;
+            font-size: 1.2rem;
+            color: var(--text-muted-color);
+        }
+        .reader-book-info {
+            background: var(--bg-color);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            width: 100%;
+            border-radius: var(--default-radius);
+        }
+        .reader-book-info img {
+            max-width: 200px;
+            margin: 0 auto 1rem auto;
+            border-radius: var(--default-radius);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .reader-book-info h2 {
+            margin-bottom: 0.25rem;
+        }
+        .reader-book-info p {
+            color: var(--text-muted-color);
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="reader-container">
+        <header class="reader-header">
+            <a href="javascript:history.back()">← Назад</a>
+            <h1 id="book-title-header">Завантаження...</h1>
+            <div id="reader-controls" class="reader-controls">
+                <button id="prev-page">‹</button>
+                <span>Сторінка <span id="page-num"></span> з <span id="page-count"></span></span>
+                <button id="next-page">›</button>
+            </div>
+        </header>
+        <main class="reader-main">
+            <div id="loader">Завантаження книги...</div>
+            <div id="pdf-container" style="display: none;">
+                <div id="book-info-wrapper" class="reader-book-info"></div>
+                <div id="pdf-viewer"></div>
+            </div>
+        </main>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>
