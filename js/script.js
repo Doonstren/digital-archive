@@ -629,9 +629,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.title = `${book.title} – Читалка`;
                 if(titleHeader) titleHeader.textContent = book.title;
                 
-                let bookmarkedPages = JSON.parse(sessionStorage.getItem(`bookmarks_${bookId}`) || '[]');
-                
-                const storageKey = `lastPage_${book.id}`;
+                const lastPageKey = `lastPage_${book.id}`;
+                const primaryBookmarkKey = `primaryBookmark_${book.id}`;
 
                 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js`;
 
@@ -692,12 +691,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
                     
                     if (pageNumEl) pageNumEl.textContent = num;
+                    
                     if (bookmarkBtn) {
-                        if(bookmarkedPages.includes(num)) {
-                           bookmarkBtn.classList.add('active');
-                        } else {
-                           bookmarkBtn.classList.remove('active');
-                        }
+                        const primaryBookmark = parseInt(localStorage.getItem(primaryBookmarkKey) || '0');
+                        bookmarkBtn.classList.toggle('active', num === primaryBookmark);
                     }
                 }
 
@@ -712,29 +709,30 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('prev-page')?.addEventListener('click', () => {
                     if (pageNum <= 1) return;
                     pageNum--;
-                    localStorage.setItem(storageKey, pageNum);
+                    localStorage.setItem(lastPageKey, pageNum);
                     queueRenderPage(pageNum);
                 });
 
                 document.getElementById('next-page')?.addEventListener('click', () => {
                     if (pageNum >= pdfDoc.numPages) return;
                     pageNum++;
-                    localStorage.setItem(storageKey, pageNum);
+                    localStorage.setItem(lastPageKey, pageNum);
                     queueRenderPage(pageNum);
                 });
                 
                 if (bookmarkBtn) {
                     bookmarkBtn.addEventListener('click', () => {
-                        const index = bookmarkedPages.indexOf(pageNum);
-                        if (index > -1) {
-                            bookmarkedPages.splice(index, 1);
+                        let primaryBookmark = parseInt(localStorage.getItem(primaryBookmarkKey) || '0');
+                        
+                        if (primaryBookmark === pageNum) {
+                            localStorage.removeItem(primaryBookmarkKey);
                             showToast(`Закладку на сторінці ${pageNum} видалено`);
+                            bookmarkBtn.classList.remove('active');
                         } else {
-                            bookmarkedPages.push(pageNum);
-                            showToast(`Закладку на сторінці ${pageNum} додано`);
+                            localStorage.setItem(primaryBookmarkKey, pageNum);
+                            showToast(`Закладку на сторінці ${pageNum} збережено`);
+                            bookmarkBtn.classList.add('active');
                         }
-                        sessionStorage.setItem(`bookmarks_${bookId}`, JSON.stringify(bookmarkedPages));
-                        bookmarkBtn.classList.toggle('active', bookmarkedPages.includes(pageNum));
                     });
                 }
 
@@ -742,8 +740,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     pdfDoc = pdfDoc_;
                     if (pageCountEl) pageCountEl.textContent = pdfDoc.numPages;
                     
-                    const savedPage = parseInt(localStorage.getItem(storageKey), 10);
-                    if (savedPage && savedPage > 0 && savedPage <= pdfDoc.numPages) {
+                    const savedBookmark = parseInt(localStorage.getItem(primaryBookmarkKey), 10);
+                    const savedPage = parseInt(localStorage.getItem(lastPageKey), 10);
+
+                    if (savedBookmark && savedBookmark > 0 && savedBookmark <= pdfDoc.numPages) {
+                        pageNum = savedBookmark;
+                        showToast(`Відкрито на закладці, сторінка ${pageNum}`);
+                    } else if (savedPage && savedPage > 0 && savedPage <= pdfDoc.numPages) {
                         pageNum = savedPage;
                         showToast(`Відкрито на збереженій сторінці ${pageNum}`);
                     }
