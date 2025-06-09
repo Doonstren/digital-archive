@@ -18,7 +18,7 @@
     --font-size-base: 16px;
     --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --header-height: 70px;
-    --max-width: 1200px;
+    --max-width: 1300px;
 }
 
 html.dark-theme {
@@ -109,6 +109,7 @@ img {
     font-size: 1rem;
     border-radius: var(--default-radius);
     transition: all .15s ease-in-out;
+    white-space: nowrap;
 }
 .btn:hover {
     background-color: var(--primary-color);
