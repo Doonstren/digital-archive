@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const prompt = constructGeminiPrompt(userText);
 
                 try {
-                    const response = await fetch('https://digital-archive-proxy-doonstrens-projects.vercel.app/', {
+                    const response = await fetch('https://digital-archive-proxy-doonstrens-projects.vercel.app/api/gemini', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
