@@ -12,7 +12,8 @@
             margin: 0;
             padding: 0;
             height: 100%;
-            background-color: #f0f0f0;
+            overflow: hidden;
+            background-color: #525659;
         }
         .reader-container {
             display: flex;
@@ -23,104 +24,117 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.5rem 1rem;
+            padding: 0.75rem 1rem;
             background-color: var(--bg-alt-color);
             border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
             color: var(--text-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 10;
         }
-        .reader-header a {
-            font-size: 1.2rem;
+        .reader-header .back-link {
+            font-size: 1rem;
             text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
         }
         .reader-header h1 {
-            font-size: 1.1rem;
+            font-size: 1rem;
             margin: 0;
             text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 1rem;
         }
         .reader-controls {
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
             align-items: center;
-        }
-        .reader-controls button, .reader-controls span {
-            font-size: 1rem;
+            justify-content: flex-end;
+            min-width: 200px;
         }
         .reader-controls button {
-            background: none;
-            border: 1px solid transparent;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
             cursor: pointer;
-            padding: 0.25rem 0.5rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 1.2rem;
+            line-height: 1;
+            border-radius: var(--default-radius);
+            transition: background-color 0.2s;
         }
         .reader-controls button:hover {
-            background-color: #ddd;
+            background-color: #e2e6ea;
+        }
+        .reader-controls .page-info {
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0 0.5rem;
+            color: var(--text-muted-color);
+            white-space: nowrap;
+        }
+        #bookmark-btn {
+            font-size: 1.5rem;
+            padding: 0.3rem 0.6rem;
+            color: #ccc;
+        }
+        #bookmark-btn.active {
+            color: #ffc107;
+            border-color: #ffc107;
         }
         .reader-main {
             flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
             overflow-y: auto;
             padding: 2rem 1rem;
-        }
-        #pdf-viewer {
-            max-width: 800px;
-            width: 100%;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            text-align: center;
         }
         #pdf-viewer canvas {
             display: block;
-            width: 100%;
+            margin: 0 auto 1.5rem auto;
+            max-width: 100%;
             height: auto;
-            margin-bottom: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
         #loader {
-            text-align: center;
             padding: 4rem;
             font-size: 1.2rem;
-            color: var(--text-muted-color);
+            color: #fff;
         }
-        .reader-book-info {
-            background: var(--bg-color);
-            padding: 2rem;
-            text-align: center;
-            margin-bottom: 2rem;
-            max-width: 800px;
-            width: 100%;
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.75);
+            color: white;
+            padding: 1rem 1.5rem;
             border-radius: var(--default-radius);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s, bottom 0.5s;
         }
-        .reader-book-info img {
-            max-width: 200px;
-            margin: 0 auto 1rem auto;
-            border-radius: var(--default-radius);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .reader-book-info h2 {
-            margin-bottom: 0.25rem;
-        }
-        .reader-book-info p {
-            color: var(--text-muted-color);
-            margin: 0;
+        .toast-notification.show {
+            opacity: 1;
+            bottom: 30px;
         }
     </style>
 </head>
 <body>
     <div class="reader-container">
         <header class="reader-header">
-            <a href="javascript:history.back()">← Назад</a>
+            <a href="javascript:history.back()" class="back-link">← Назад до книги</a>
             <h1 id="book-title-header">Завантаження...</h1>
             <div id="reader-controls" class="reader-controls">
-                <button id="prev-page">‹</button>
-                <span>Сторінка <span id="page-num"></span> з <span id="page-count"></span></span>
-                <button id="next-page">›</button>
+                <button id="prev-page" title="Попередня сторінка">‹</button>
+                <span class="page-info"><span id="page-num"></span> / <span id="page-count"></span></span>
+                <button id="next-page" title="Наступна сторінка">›</button>
+                <button id="bookmark-btn" title="Додати закладку">★</button>
             </div>
         </header>
         <main class="reader-main">
             <div id="loader">Завантаження книги...</div>
-            <div id="pdf-container" style="display: none;">
-                <div id="book-info-wrapper" class="reader-book-info"></div>
-                <div id="pdf-viewer"></div>
-            </div>
+            <div id="pdf-viewer"></div>
         </main>
     </div>
     <script src="js/script.js"></script>

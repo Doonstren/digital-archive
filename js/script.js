@@ -12,6 +12,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    function showToast(message) {
+        const existingToast = document.querySelector('.toast-notification');
+        if(existingToast) {
+            existingToast.remove();
+        }
+
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.remove();
+            }, 500);
+        }, 3000);
+    }
+
     function initializeApp() {
         const currentPath = window.location.pathname.split('/').pop() || 'index.html';
 
@@ -248,24 +271,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             const book = bookDatabase.find(b => b.id === bookId);
 
             const titleHeader = document.getElementById('book-title-header');
-            const bookInfoWrapper = document.getElementById('book-info-wrapper');
             const loader = document.getElementById('loader');
-            const pdfContainer = document.getElementById('pdf-container');
+            const bookmarkBtn = document.getElementById('bookmark-btn');
             
+            if (bookmarkBtn) {
+                bookmarkBtn.addEventListener('click', (e) => {
+                    e.currentTarget.classList.toggle('active');
+                    if (e.currentTarget.classList.contains('active')) {
+                        showToast('Закладку додано!');
+                    } else {
+                        showToast('Закладку видалено.');
+                    }
+                });
+            }
+
             if (book && book.filePathPDF) {
                 document.title = `${book.title} – Читалка`;
                 if(titleHeader) titleHeader.textContent = book.title;
-
-                if(bookInfoWrapper) {
-                    bookInfoWrapper.innerHTML = `
-                        <img src="${book.coverUrl}" alt="Обкладинка ${book.title}">
-                        <h2>${book.title}</h2>
-                        <p>${book.author}</p>
-                    `;
-                }
                 
-                if (pdfContainer) pdfContainer.style.display = 'block';
-
                 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js`;
 
                 let pdfDoc = null,
@@ -282,7 +305,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     pageRendering = true;
                     pdfDoc.getPage(num).then(function(page) {
                         const viewport = page.getViewport({ scale: scale });
-                        
                         const canvas = document.createElement('canvas');
                         const context = canvas.getContext('2d');
                         canvas.height = viewport.height;
@@ -293,13 +315,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                             viewer.appendChild(canvas);
                         }
                         
-                        const renderContext = {
-                            canvasContext: context,
-                            viewport: viewport
-                        };
-                        const renderTask = page.render(renderContext);
-
-                        renderTask.promise.then(function() {
+                        const renderTask = page.render({ canvasContext: context, viewport: viewport });
+                        renderTask.promise.then(() => {
                             pageRendering = false;
                             if (pageNumPending !== null) {
                                 renderPage(pageNumPending);
