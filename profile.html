@@ -11,7 +11,7 @@
 <header class="site-header">
   <div class="container">
     <a href="index.html" class="logo"><img src="img/logo.png" alt='Логотип "Цифровий Архів"'></a>
-    <button class="mobile-menu-toggle">&#9776;</button>
+    <button class="mobile-menu-toggle">☰</button>
     <nav class="main-nav">
       <ul>
         <li><a href="index.html">Головна</a></li>
@@ -21,33 +21,67 @@
         <li><a href="contact.html">Контакти</a></li>
       </ul>
     </nav>
+    <div class="header-actions">
+      <a href="neuro_librarian.html" class="btn btn-neuro-header">Нейро-Бібліотекар</a>
+      <form class="search-form" action="search.html" method="get">
+        <input type="search" name="q" placeholder="Пошук..." aria-label="Пошук книг">
+        <button type="submit">Знайти</button>
+      </form>
+    </div>
   </div>
 </header>
 
 <main>
-  <div class="container">
-    <h1>Вхід</h1>
-    <form class="auth-form">
-      <label>Email <input type="email" required></label>
-      <label>Пароль <input type="password" required></label>
-      <button class="btn">Увійти</button>
-    </form>
+  <div class="auth-container">
+    <div class="auth-toggle">
+      <button id="show-login" class="auth-toggle-btn active">Вхід</button>
+      <button id="show-register" class="auth-toggle-btn">Реєстрація</button>
+    </div>
 
-    <hr>
+    <div class="auth-form-wrapper" id="auth-form-wrapper">
+      <form class="auth-form" id="login-form" autocomplete="off">
+        <h1 class="auth-title">Вхід до системи</h1>
+        <div class="form-group">
+          <label for="login-email">Email:</label>
+          <input type="email" id="login-email" name="loginEmail" required>
+        </div>
+        <div class="form-group">
+          <label for="login-password">Пароль:</label>
+          <input type="password" id="login-password" name="loginPassword" required>
+        </div>
+        <button type="submit" class="btn auth-submit-btn">Увійти</button>
+        <p class="form-message" id="login-message"></p>
+      </form>
 
-    <h1>Реєстрація</h1>
-    <form class="auth-form">
-      <label>Ім'я <input type="text" required></label>
-      <label>Email <input type="email" required></label>
-      <label>Пароль <input type="password" required></label>
-      <button class="btn">Зареєструватися</button>
-    </form>
+      <form class="auth-form hidden" id="register-form" autocomplete="off">
+        <h1 class="auth-title">Створення акаунту</h1>
+        <div class="form-group">
+          <label for="register-name">Ваше ім'я:</label>
+          <input type="text" id="register-name" name="registerName" required>
+        </div>
+        <div class="form-group">
+          <label for="register-email">Email:</label>
+          <input type="email" id="register-email" name="registerEmail" required>
+        </div>
+        <div class="form-group">
+          <label for="register-password">Пароль (мін. 6 символів):</label>
+          <input type="password" id="register-password" name="registerPassword" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label for="register-password-confirm">Підтвердіть пароль:</label>
+          <input type="password" id="register-password-confirm" name="registerPasswordConfirm" required minlength="6">
+        </div>
+        <button type="submit" class="btn auth-submit-btn">Зареєструватися</button>
+        <p class="form-message" id="register-message"></p>
+      </form>
+    </div>
   </div>
 </main>
 
 <footer class="site-footer">
   <div class="container">
-    <p>&copy; 2025 ТОВ "Освітній Простір". Всі права захищено.</p>
+    <p>© 2025 ТОВ "Освітній Простір". Всі права захищено.</p>
+    <p><a href="#">Політика конфіденційності</a> | <a href="about.html">Про нас</a> | <a href="contact.html">Контакти</a></p>
   </div>
 </footer>
 

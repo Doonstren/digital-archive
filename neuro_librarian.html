@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Пошук – «Цифровий Архів»</title>
+  <title>Нейро-Бібліотекар – «Цифровий Архів»</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" type="image/x-icon" href="img/favicon.ico">
 </head>
@@ -22,9 +22,9 @@
       </ul>
     </nav>
     <div class="header-actions">
-      <a href="neuro_librarian.html" class="btn btn-neuro-header">Нейро-Бібліотекар</a>
-      <form class="search-form" id="header-search-form" action="search.html" method="get">
-        <input type="search" name="q" id="header-search-input" placeholder="Пошук..." aria-label="Пошук книг">
+      <a href="neuro_librarian.html" class="btn btn-neuro-header active">Нейро-Бібліотекар</a>
+      <form class="search-form" action="search.html" method="get">
+        <input type="search" name="q" placeholder="Пошук..." aria-label="Пошук книг">
         <button type="submit">Знайти</button>
       </form>
       <div class="auth-links">
@@ -34,19 +34,18 @@
   </div>
 </header>
 
-<main>
-  <div class="container">
-    <h1 id="search-results-title">Результати пошуку</h1>
-
-    <section id="search-results-section">
-      <div id="search-no-results" class="hidden">
-          <p>На жаль, за вашим запитом "<span id="searched-query-no-results"></span>" нічого не знайдено.</p>
-          <p>Спробуйте змінити запит, перевірити орфографію або переглянути <a href="catalog.html">повний каталог</a>.</p>
+<main class="chat-page-main">
+  <div class="chat-container">
+    <h1 class="chat-title">Чат з ШІ-помічником</h1>
+    <div class="chat-messages" id="chatMessages">
+      <div class="message ai-message">
+        <p>Вітаю! Я ваш особистий бібліотечний ШІ-асистент. Готовий допомогти вам знайти ідеальну книгу або просто поговорити про літературу. Не соромтеся ставити запитання!</p>
       </div>
-      
-      <div class="book-grid" id="search-results-grid">
-      </div>
-    </section>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chatInput" placeholder="Порадьте книгу про майбутнє та технології...">
+      <button id="sendMessageBtn" class="btn btn-neuro">Надіслати</button>
+    </div>
   </div>
 </main>
 

@@ -11,7 +11,7 @@
 <header class="site-header">
   <div class="container">
     <a href="index.html" class="logo"><img src="img/logo.png" alt='Логотип "Цифровий Архів"'></a>
-    <button class="mobile-menu-toggle">&#9776;</button>
+    <button class="mobile-menu-toggle">☰</button>
     <nav class="main-nav">
       <ul>
         <li><a href="index.html">Головна</a></li>
@@ -22,8 +22,9 @@
       </ul>
     </nav>
     <div class="header-actions">
+      <a href="neuro_librarian.html" class="btn btn-neuro-header">Нейро-Бібліотекар</a>
       <form class="search-form" action="search.html" method="get">
-        <input type="search" name="q" placeholder="Пошук книг..." aria-label="Пошук книг">
+        <input type="search" name="q" placeholder="Пошук..." aria-label="Пошук книг">
         <button type="submit">Знайти</button>
       </form>
       <div class="auth-links">
@@ -35,45 +36,64 @@
 
 <main>
   <div class="container">
+    <nav class="breadcrumbs" aria-label="breadcrumb">
+        <a href="index.html">Головна</a>
+        <span>»</span>
+        <span>Допомога / FAQ</span>
+    </nav>
     <h1>Допомога та часті запитання (FAQ)</h1>
 
     <section class="faq-section">
       <article class="faq-item">
         <h3>Як знайти потрібну книгу?</h3>
         <div class="faq-answer">
-          <p>Ви можете скористатися полем пошуку у верхній частині сайту, ввівши назву книги, автора або ключові слова з анотації.</p>
-          <p>Також ви можете перейти до розділу <a href="catalog.html">Каталог</a> та переглянути книги за категоріями або скористатися фільтрами.</p>
+          <p>Ви можете скористатися полем пошуку у верхній частині сайту, ввівши назву книги, автора або ключові слова. Також ви можете перейти до розділу <a href="catalog.html">Каталог</a> та скористатися фільтрами за категоріями, автором, роком видання.</p>
+          <p>Для більш гнучкого пошуку за описом, настроєм або для отримання рекомендацій, скористайтеся нашим <a href="neuro_librarian.html">Нейро-Бібліотекарем</a>.</p>
+        </div>
+      </article>
+
+      <article class="faq-item">
+        <h3>Як працює Нейро-Бібліотекар?</h3>
+        <div class="faq-answer">
+          <p>Нейро-Бібліотекар – це інтелектуальний помічник, який використовує технології штучного інтелекту для розуміння ваших запитів. Ви можете описати книгу своїми словами, вказати бажаний настрій, тематику, або попросити порадити щось схоже на вже прочитане. Нейро-Бібліотекар проаналізує ваш запит і запропонує найбільш релевантні книги з нашого архіву.</p>
         </div>
       </article>
 
       <article class="faq-item">
         <h3>В яких форматах можна завантажити книги?</h3>
         <div class="faq-answer">
-          <p>Більшість книг доступні у форматах PDF та EPUB. Деякі книги можуть бути доступні також у форматі FB2 або інших.</p>
+          <p>Більшість книг доступні у форматах PDF, EPUB та TXT. На сторінці кожної книги вказані доступні формати для завантаження.</p>
         </div>
       </article>
 
       <article class="faq-item">
         <h3>Чи потрібно реєструватися для читання або завантаження?</h3>
         <div class="faq-answer">
-          <p>Наразі читання онлайн та завантаження книг доступні без реєстрації. Реєстрація дає можливість зберігати історію читання і створювати «полиці».</p>
+          <p>Читання онлайн та завантаження книг доступні без реєстрації. Реєстрація (<a href="profile.html">створити акаунт</a>) дає додаткові можливості, такі як збереження історії читання, створення власних "полиць" з улюбленими книгами, залишення відгуків та участь в обговореннях.</p>
         </div>
       </article>
 
       <article class="faq-item">
         <h3>Як читати книгу онлайн?</h3>
         <div class="faq-answer">
-          <p>На сторінці книги натисніть кнопку «Читати онлайн» – книга відкриється у вбудованому переглядачі.</p>
+          <p>На сторінці книги натисніть кнопку «Читати онлайн». Книга відкриється у вбудованому переглядачі у вашому браузері. Функціонал знаходиться в розробці.</p>
+        </div>
+      </article>
+       <article class="faq-item">
+        <h3>Як залишити відгук про книгу?</h3>
+        <div class="faq-answer">
+          <p>Для того, щоб залишити відгук, вам необхідно <a href="profile.html">зареєструватися</a> або <a href="profile.html">увійти</a> у свій обліковий запис. Після цього на сторінці книги з'явиться форма для додавання відгуку та виставлення оцінки.</p>
         </div>
       </article>
     </section>
 
-    <section>
+    <section class="sitemap-section">
       <h2>Карта сайту</h2>
-      <ul>
-        <li><a href="index.html">Головна</a></li>
-        <li><a href="catalog.html">Каталог</a></li>
-        <li><a href="search.html">Пошук</a></li>
+      <ul class="sitemap-list">
+        <li><a href="index.html">Головна сторінка</a></li>
+        <li><a href="catalog.html">Каталог книг</a></li>
+        <li><a href="neuro_librarian.html">Нейро-Бібліотекар</a></li>
+        <li><a href="search.html">Результати пошуку</a></li>
         <li><a href="about.html">Про нас</a></li>
         <li><a href="help.html">Допомога / FAQ</a></li>
         <li><a href="contact.html">Контакти</a></li>
@@ -85,7 +105,7 @@
 
 <footer class="site-footer">
   <div class="container">
-    <p>&copy; 2025 ТОВ "Освітній Простір". Всі права захищено.</p>
+    <p>© 2025 ТОВ "Освітній Простір". Всі права захищено.</p>
     <p><a href="#">Політика конфіденційності</a> | <a href="about.html">Про нас</a> | <a href="contact.html">Контакти</a></p>
   </div>
 </footer>

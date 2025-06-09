@@ -11,7 +11,7 @@
 <header class="site-header">
   <div class="container">
     <a href="index.html" class="logo"><img src="img/logo.png" alt='Логотип "Цифровий Архів"'></a>
-    <button class="mobile-menu-toggle">&#9776;</button>
+    <button class="mobile-menu-toggle">☰</button>
     <nav class="main-nav">
       <ul>
         <li><a href="index.html" class="active">Головна</a></li>
@@ -22,8 +22,9 @@
       </ul>
     </nav>
     <div class="header-actions">
+      <a href="neuro_librarian.html" class="btn btn-neuro-header">Нейро-Бібліотекар</a>
       <form class="search-form" action="search.html" method="get">
-        <input type="search" name="q" placeholder="Пошук книг..." aria-label="Пошук книг">
+        <input type="search" name="q" placeholder="Пошук..." aria-label="Пошук книг">
         <button type="submit">Знайти</button>
       </form>
       <div class="auth-links">
@@ -34,41 +35,24 @@
 </header>
 
 <main>
-  <div class="container">
-    <h1>Ласкаво просимо до «Цифрового Архіву»!</h1>
-    <p class="lead">Ваша електронна бібліотека для навчання, досліджень та відпочинку.</p>
+  <section class="hero-section">
+    <div class="container">
+      <h1>Відкрийте Новий Спосіб Пошуку Книг</h1>
+      <p class="lead">Наш Нейро-Бібліотекар розуміє ваші побажання краще, ніж будь-коли. Знайдіть книгу за описом, настроєм чи отримайте унікальні рекомендації.</p>
+      <div class="neuro-search-box">
+        <input type="text" id="neuroSearchInputMain" placeholder="Запитайте: 'Хочу щось легке та смішне для відпочинку'">
+        <button id="neuroSearchBtnMain" class="btn btn-neuro-main">Знайти</button>
+      </div>
+      <div class="hero-actions">
+        <a href="catalog.html" class="btn btn-secondary">Переглянути весь каталог</a>
+      </div>
+    </div>
+  </section>
 
+  <div class="container">
     <section>
       <h2>Нові надходження</h2>
-
-      <div class="book-grid">
-        <article class="book-card">
-          <img src="img/placeholder.jpg" alt="Обкладинка книги 1">
-          <h3>Назва дуже цікавої книги 1</h3>
-          <p class="author">Автор А. Б.</p>
-          <a class="btn" href="book.html">Детальніше</a>
-        </article>
-
-        <article class="book-card">
-          <img src="img/placeholder.jpg" alt="Обкладинка книги 2">
-          <h3>Інша важлива книга</h3>
-          <p class="author">Автор В. Г.</p>
-          <a class="btn" href="book.html">Детальніше</a>
-        </article>
-
-        <article class="book-card">
-          <img src="img/placeholder.jpg" alt="Обкладинка книги 3">
-          <h3>Класика жанру: Том перший</h3>
-          <p class="author">Відомий Класик</p>
-          <a class="btn" href="book.html">Детальніше</a>
-        </article>
-
-        <article class="book-card">
-          <img src="img/placeholder.jpg" alt="Обкладинка книги 4">
-          <h3>Сучасні технології в освіті</h3>
-          <p class="author">Професор П. Р.</p>
-          <a class="btn" href="book.html">Детальніше</a>
-        </article>
+      <div class="book-grid" id="new-arrivals-grid">
       </div>
     </section>
 
@@ -80,6 +64,7 @@
         <li><a href="catalog.html?category=art">Мистецтво</a></li>
         <li><a href="catalog.html?category=fiction">Художня література</a></li>
         <li><a href="catalog.html?category=science">Наука</a></li>
+        <li><a href="catalog.html?category=psychology">Психологія</a></li>
       </ul>
     </section>
   </div>
@@ -87,7 +72,7 @@
 
 <footer class="site-footer">
   <div class="container">
-    <p>&copy; 2025 ТОВ "Освітній Простір". Всі права захищено.</p>
+    <p>© 2025 ТОВ "Освітній Простір". Всі права захищено.</p>
     <p><a href="#">Політика конфіденційності</a> | <a href="about.html">Про нас</a> | <a href="contact.html">Контакти</a></p>
   </div>
 </footer>
