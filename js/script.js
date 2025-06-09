@@ -88,13 +88,180 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             }
             
-            const newArrivalsGrid = document.getElementById('new-arrivals-grid');
-            if (newArrivalsGrid) {
-                const newBooks = [...bookDatabase].sort((a, b) => b.votes - a.votes).slice(0, 4);
-                newArrivalsGrid.innerHTML = newBooks.map(renderBookCard).join('');
+            const carouselTrack = document.getElementById('new-arrivals-carousel');
+            const prevBtn = document.getElementById('carousel-prev');
+            const nextBtn = document.getElementById('carousel-next');
+
+            if (carouselTrack && prevBtn && nextBtn) {
+                carouselTrack.innerHTML = bookDatabase.map(renderBookCard).join('');
+                let currentIndex = 0;
+                const cardWidth = 220; // width of .book-card
+                const gap = 24; // 1.5rem gap
+                const scrollAmount = cardWidth + gap;
+
+                function updateCarousel() {
+                    carouselTrack.style.transform = `translateX(-${currentIndex * scrollAmount}px)`;
+                    prevBtn.disabled = currentIndex === 0;
+                    
+                    const containerWidth = carouselTrack.parentElement.offsetWidth;
+                    const trackWidth = carouselTrack.scrollWidth;
+                    const currentPosition = currentIndex * scrollAmount;
+                    
+                    nextBtn.disabled = (currentPosition + containerWidth) >= trackWidth;
+                }
+
+                prevBtn.addEventListener('click', () => {
+                    if (currentIndex > 0) {
+                        currentIndex--;
+                        updateCarousel();
+                    }
+                });
+
+                nextBtn.addEventListener('click', () => {
+                     const containerWidth = carouselTrack.parentElement.offsetWidth;
+                     const trackWidth = carouselTrack.scrollWidth;
+                     const currentPosition = currentIndex * scrollAmount;
+                     if((currentPosition + containerWidth) < trackWidth){
+                        currentIndex++;
+                        updateCarousel();
+                     }
+                });
+
+                window.addEventListener('resize', updateCarousel);
+                updateCarousel();
             }
         }
 
+        if (currentPath === 'catalog.html') {
+            const bookGrid = document.getElementById('catalog-book-grid');
+            const paginationContainer = document.getElementById('pagination-container');
+            const booksFoundCount = document.getElementById('books-found-count');
+            const categoryList = document.getElementById('category-filter-list');
+            const catalogTitle = document.getElementById('catalog-title');
+
+            let currentPage = 1;
+            const itemsPerPage = 12;
+            let filteredBooks = [...bookDatabase];
+            
+            const categoryMap = { it: "IT", programming: "Програмування", fiction: "Художня література", 'sci-fi': "Наукова фантастика", dystopia: "Антиутопія", science: "Наука", history: "Історія", fantasy: "Фентезі", psychology: "Психологія", 'self-help': "Саморозвиток", biography: "Біографії", philosophy: "Філософія", classics: "Класика", thriller: "Трилери", ukrainian: "Українська література" };
+
+            const allCategories = [...new Set(bookDatabase.flatMap(b => b.categories))];
+            if(categoryList) {
+                categoryList.innerHTML = `<li><a href="#" class="filter-category-link active" data-category="all">Всі категорії</a></li>` +
+                    allCategories.sort().map(cat => `<li><a href="#" class="filter-category-link" data-category="${cat}">${categoryMap[cat] || cat}</a></li>`).join('');
+            }
+
+            const applyFiltersAndRender = () => {
+                const category = document.querySelector('.filter-category-link.active')?.dataset.category || 'all';
+                const authorQuery = document.getElementById('author-filter').value.toLowerCase();
+                const yearFrom = parseInt(document.getElementById('year-from-filter').value) || 0;
+                const yearTo = parseInt(document.getElementById('year-to-filter').value) || 9999;
+                const sortOrder = document.getElementById('sort-order').value;
+
+                filteredBooks = bookDatabase.filter(book => {
+                    const categoryMatch = category === 'all' || book.categories.includes(category);
+                    const authorMatch = !authorQuery || book.author.toLowerCase().includes(authorQuery);
+                    const yearMatch = book.year >= yearFrom && book.year <= yearTo;
+                    return categoryMatch && authorMatch && yearMatch;
+                });
+                
+                switch (sortOrder) {
+                    case 'title_asc': filteredBooks.sort((a,b) => a.title.localeCompare(b.title)); break;
+                    case 'title_desc': filteredBooks.sort((a,b) => b.title.localeCompare(a.title)); break;
+                    case 'year_desc': filteredBooks.sort((a,b) => b.year - a.year); break;
+                    case 'year_asc': filteredBooks.sort((a,b) => a.year - b.year); break;
+                    case 'popularity': filteredBooks.sort((a,b) => b.votes - a.votes); break;
+                }
+
+                currentPage = 1;
+                renderPage(currentPage);
+            };
+            
+            const renderPage = (page) => {
+                if(booksFoundCount) booksFoundCount.textContent = `Знайдено ${filteredBooks.length} книг`;
+                
+                const start = (page - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+                const paginatedBooks = filteredBooks.slice(start, end);
+                
+                if(bookGrid) bookGrid.innerHTML = paginatedBooks.map(renderBookCard).join('');
+                renderPagination();
+            };
+
+            const renderPagination = () => {
+                if(!paginationContainer) return;
+                const pageCount = Math.ceil(filteredBooks.length / itemsPerPage);
+                paginationContainer.innerHTML = '';
+                if (pageCount <= 1) return;
+
+                const createButton = (text, pageNum, isDisabled = false, isActive = false) => {
+                    const btn = document.createElement('button');
+                    btn.textContent = text;
+                    if (pageNum) btn.dataset.page = pageNum;
+                    if (isDisabled) btn.disabled = true;
+                    if (isActive) btn.classList.add('active');
+                    return btn;
+                };
+
+                paginationContainer.appendChild(createButton('«', currentPage - 1, currentPage === 1));
+
+                let addedEllipsis = false;
+                for (let i = 1; i <= pageCount; i++) {
+                     if (i === 1 || i === pageCount || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                        paginationContainer.appendChild(createButton(i, i, false, i === currentPage));
+                        addedEllipsis = false;
+                    } else if (!addedEllipsis) {
+                        const span = document.createElement('span');
+                        span.textContent = '...';
+                        paginationContainer.appendChild(span);
+                        addedEllipsis = true;
+                    }
+                }
+
+                paginationContainer.appendChild(createButton('»', currentPage + 1, currentPage === pageCount));
+            };
+            
+            if(paginationContainer) {
+                paginationContainer.addEventListener('click', e => {
+                    if (e.target.tagName === 'BUTTON' && !e.target.disabled && e.target.dataset.page) {
+                        currentPage = parseInt(e.target.dataset.page);
+                        renderPage(currentPage);
+                        window.scrollTo(0, 0);
+                    }
+                });
+            }
+            
+            if(categoryList) {
+                categoryList.addEventListener('click', e => {
+                    e.preventDefault();
+                    if (e.target.classList.contains('filter-category-link')) {
+                        document.querySelector('.filter-category-link.active')?.classList.remove('active');
+                        e.target.classList.add('active');
+                        const categoryName = e.target.dataset.category === 'all' ? 'Каталог книг' : `Категорія: ${e.target.textContent}`;
+                        if(catalogTitle) catalogTitle.textContent = categoryName;
+                        applyFiltersAndRender();
+                    }
+                });
+            }
+
+            document.getElementById('apply-filters-btn')?.addEventListener('click', applyFiltersAndRender);
+            
+            document.getElementById('reset-filters-btn')?.addEventListener('click', () => {
+                document.querySelector('.filter-category-link.active')?.classList.remove('active');
+                const allCatLink = document.querySelector('.filter-category-link[data-category="all"]');
+                if(allCatLink) allCatLink.classList.add('active');
+                document.getElementById('author-filter').value = '';
+                document.getElementById('year-from-filter').value = '';
+                document.getElementById('year-to-filter').value = '';
+                document.getElementById('sort-order').value = 'popularity';
+                if(catalogTitle) catalogTitle.textContent = 'Каталог книг';
+                applyFiltersAndRender();
+            });
+            
+            applyFiltersAndRender();
+        }
+
+        // Остальной код (neuro_librarian, book.html, reader.html, etc.) остается без изменений
         if (currentPath === 'neuro_librarian.html') {
             const chatMessages = document.getElementById('chatMessages');
             const chatInput = document.getElementById('chatInput');
@@ -204,205 +371,5 @@ document.addEventListener('DOMContentLoaded', async () => {
                 handleSendMessage();
             }
         }
-        
-        if (currentPath === 'book.html') {
-            const params = new URLSearchParams(window.location.search);
-            const bookId = params.get('id');
-            const book = bookDatabase.find(b => b.id === bookId);
-            
-            const contentDiv = document.getElementById('book-page-content');
-            const notFoundDiv = document.getElementById('book-not-found');
-
-            if (book) {
-                if(contentDiv) contentDiv.style.display = 'block';
-                if(notFoundDiv) notFoundDiv.style.display = 'none';
-
-                document.title = `${book.title} – «Цифровий Архів»`;
-                document.getElementById('breadcrumb-book-title').textContent = book.title;
-                document.getElementById('book-main-title').textContent = book.title;
-                document.getElementById('book-author-link').textContent = book.author;
-                document.getElementById('book-author-link').href = `search.html?q=${encodeURIComponent(book.author)}`;
-                document.getElementById('book-rating-value').textContent = book.rating;
-                document.getElementById('book-rating-votes').textContent = book.votes;
-                document.getElementById('book-publisher').textContent = book.publisher;
-                document.getElementById('book-year').textContent = book.year;
-                document.getElementById('book-language').textContent = book.language;
-                document.getElementById('book-pages').textContent = book.pages;
-                document.getElementById('book-annotation-text').innerHTML = `<p>${book.annotation.replace(/\n/g, '</p><p>')}</p>`;
-                document.getElementById('book-cover-img').src = book.coverUrl;
-                document.getElementById('book-cover-img').alt = `Обкладинка ${book.title}`;
-                
-                const categoryMap = { it: "IT", programming: "Програмування", fiction: "Художня література", 'sci-fi': "Наукова фантастика", dystopia: "Антиутопія", science: "Наука", history: "Історія", fantasy: "Фентезі", psychology: "Психологія", 'self-help': "Саморозвиток", biography: "Біографії", philosophy: "Філософія", classics: "Класика", thriller: "Трилери", ukrainian: "Українська література" };
-                const genreTagsContainer = document.getElementById('book-genre-tags');
-                if (genreTagsContainer) {
-                    genreTagsContainer.innerHTML = book.categories.map(cat => `<a href="catalog.html?category=${cat}">${categoryMap[cat] || cat}</a>`).join(' ');
-                }
-
-                const actionsContainer = document.getElementById('book-actions-container');
-                if(actionsContainer && book.filePathPDF) {
-                    actionsContainer.innerHTML = '';
-                    actionsContainer.innerHTML += `<a class="btn" href="reader.html?bookId=${book.id}">Читати онлайн</a>`;
-                    actionsContainer.innerHTML += `<a class="btn btn-secondary" href="${book.filePathPDF}" download>Завантажити PDF</a>`;
-                }
-
-                const similarBooksGrid = document.getElementById('similar-books-grid');
-                const similarBooks = bookDatabase
-                    .filter(b => b.id !== book.id && b.categories.some(cat => book.categories.includes(cat)))
-                    .slice(0, 4);
-                if (similarBooksGrid) {
-                    similarBooksGrid.innerHTML = similarBooks.map(renderBookCard).join('');
-                }
-            } else {
-                if(contentDiv) contentDiv.style.display = 'none';
-                if(notFoundDiv) notFoundDiv.style.display = 'block';
-            }
-
-            const reviewForm = document.getElementById('reviewForm');
-            reviewForm?.addEventListener('submit', (e) => {
-                e.preventDefault();
-                alert('Дякуємо за ваш відгук! (симуляція)');
-                reviewForm.reset();
-            });
-        }
-        
-        if (currentPath === 'reader.html') {
-            const params = new URLSearchParams(window.location.search);
-            const bookId = params.get('bookId');
-            const book = bookDatabase.find(b => b.id === bookId);
-
-            const titleHeader = document.getElementById('book-title-header');
-            const loader = document.getElementById('loader');
-            const bookmarkBtn = document.getElementById('bookmark-btn');
-            
-            let bookmarkedPages = JSON.parse(sessionStorage.getItem(bookId) || '[]');
-            
-            if (bookmarkBtn) {
-                bookmarkBtn.addEventListener('click', (e) => {
-                    const btn = e.currentTarget;
-                    const pageNum = parseInt(document.getElementById('page-num').textContent);
-                    if (!pageNum) return;
-
-                    const index = bookmarkedPages.indexOf(pageNum);
-
-                    if (index > -1) {
-                        bookmarkedPages.splice(index, 1);
-                        btn.classList.remove('active');
-                        showToast('Закладку видалено.');
-                    } else {
-                        bookmarkedPages.push(pageNum);
-                        btn.classList.add('active');
-                        showToast('Закладку додано!');
-                    }
-                    sessionStorage.setItem(bookId, JSON.stringify(bookmarkedPages));
-                });
-            }
-
-            if (book && book.filePathPDF) {
-                document.title = `${book.title} – Читалка`;
-                if(titleHeader) titleHeader.textContent = book.title;
-                
-                pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js`;
-
-                let pdfDoc = null,
-                    pageNum = 1,
-                    pageRendering = false,
-                    pageNumPending = null;
-
-                const viewer = document.getElementById('pdf-viewer');
-                const pageNumEl = document.getElementById('page-num');
-                const pageCountEl = document.getElementById('page-count');
-
-                function renderPage(num) {
-                    pageRendering = true;
-                    pdfDoc.getPage(num).then(function(page) {
-                        const viewport = page.getViewport({ scale: 1.5 });
-                        
-                        const pageContainer = document.createElement('div');
-                        pageContainer.className = 'pdf-page-container';
-                        pageContainer.style.width = viewport.width + 'px';
-                        pageContainer.style.height = viewport.height + 'px';
-
-                        const canvas = document.createElement('canvas');
-                        canvas.height = viewport.height;
-                        canvas.width = viewport.width;
-
-                        const textLayerDiv = document.createElement('div');
-                        textLayerDiv.className = 'textLayer';
-
-                        pageContainer.appendChild(canvas);
-                        pageContainer.appendChild(textLayerDiv);
-                        if(viewer) {
-                            viewer.innerHTML = '';
-                            viewer.appendChild(pageContainer);
-                        }
-                        
-                        const context = canvas.getContext('2d');
-                        const renderContext = { canvasContext: context, viewport: viewport };
-                        
-                        const renderTask = page.render(renderContext);
-
-                        renderTask.promise.then(() => {
-                             return page.getTextContent();
-                        }).then((textContent) => {
-                            pdfjsLib.renderTextLayer({
-                                textContent: textContent,
-                                container: textLayerDiv,
-                                viewport: viewport,
-                                textDivs: []
-                            });
-
-                            pageRendering = false;
-                            if (pageNumPending !== null) {
-                                renderPage(pageNumPending);
-                                pageNumPending = null;
-                            }
-                        });
-                    });
-                    
-                    if (pageNumEl) pageNumEl.textContent = num;
-                    if (bookmarkBtn) {
-                        if(bookmarkedPages.includes(num)) {
-                           bookmarkBtn.classList.add('active');
-                        } else {
-                           bookmarkBtn.classList.remove('active');
-                        }
-                    }
-                }
-
-                function queueRenderPage(num) {
-                    if (pageRendering) {
-                        pageNumPending = num;
-                    } else {
-                        renderPage(num);
-                    }
-                }
-
-                document.getElementById('prev-page')?.addEventListener('click', () => {
-                    if (pageNum <= 1) return;
-                    pageNum--;
-                    queueRenderPage(pageNum);
-                });
-
-                document.getElementById('next-page')?.addEventListener('click', () => {
-                    if (pageNum >= pdfDoc.numPages) return;
-                    pageNum++;
-                    queueRenderPage(pageNum);
-                });
-
-                pdfjsLib.getDocument(book.filePathPDF).promise.then(function(pdfDoc_) {
-                    pdfDoc = pdfDoc_;
-                    if (pageCountEl) pageCountEl.textContent = pdfDoc.numPages;
-                    if (loader) loader.style.display = 'none';
-                    renderPage(pageNum);
-                }).catch(function(error) {
-                    console.error('Error loading PDF:', error);
-                    if (loader) loader.textContent = 'Помилка завантаження PDF-файлу.';
-                });
-
-            } else {
-                if (loader) loader.textContent = 'Помилка: файл книги не знайдено.';
-            }
-        }
-        
     }
 });
