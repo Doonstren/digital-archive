@@ -156,6 +156,7 @@ img {
 .main-nav a.active, .main-nav a:hover {
     color: var(--primary-color);
     border-bottom-color: var(--primary-color);
+    text-decoration: none;
 }
 .header-actions {
     display: flex;
@@ -195,6 +196,16 @@ main {
     flex-grow: 1;
     padding-top: 1.5rem;
     padding-bottom: 2rem;
+}
+
+main section ul {
+    padding-left: 1.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+main section li {
+    margin-bottom: 0.5rem;
 }
 
 .hero-section {
@@ -346,21 +357,76 @@ main {
 .catalog-page-container { display: flex; gap: 2rem; }
 .filters {
     flex: 0 0 280px;
-    background-color: var(--bg-color);
+    background-color: var(--bg-alt-color);
     padding: 1.5rem;
     border-radius: var(--default-radius);
     align-self: flex-start;
     border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
-.filters h2 { font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
-.filter-block { margin-bottom: 1.5rem; }
-.filter-block h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+.filters h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #ced4da;
+}
+.filter-block {
+    padding-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.filter-block:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.filter-block h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--primary-color);
+}
 .filter-list { list-style: none; padding-left: 0; }
-.filter-list li a { display: block; padding: 0.25rem 0; color: var(--text-color); }
-.filter-list li a.active, .filter-list li a:hover { color: var(--primary-color); font-weight: 700; }
-.filters input, .filters select { width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: var(--default-radius); margin-bottom: 0.5rem; }
+.filter-list li a {
+    display: block;
+    padding: 0.4rem 0.5rem;
+    color: var(--text-color);
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+.filter-list li a:hover {
+    background-color: #e9ecef;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+.filter-list li a.active,
+.filter-list li a.active:hover {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 700;
+}
+.filters input, .filters select {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--default-radius);
+    margin-bottom: 0.5rem;
+    background-color: var(--bg-color);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.filters input:focus, .filters select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.2);
+}
 .year-filter-inputs { display: flex; gap: 0.5rem; align-items: center; }
-#reset-filters-btn { width: 100%; margin-top: 0.5rem; }
+#apply-filters-btn {
+    width: 100%;
+    margin-top: 1rem;
+}
+#reset-filters-btn {
+    width: 100%;
+    margin-top: 0.5rem;
+}
 .catalog-content { flex-grow: 1; }
 .catalog-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; }
 #books-found-count { font-size: 1rem; color: var(--text-muted-color); }
