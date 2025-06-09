@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const chatMessages = document.getElementById('chatMessages');
             const chatInput = document.getElementById('chatInput');
             const sendMessageBtn = document.getElementById('sendMessageBtn');
-            const vercelProxyUrl = 'https://digital-archive-proxy-doonstrens-projects.vercel.app/api/gemini'; 
+            const vercelProxyUrl = 'https://digital-archive-proxy-doonstrens-projects.vercel.app/api/gemini';
 
             const addMessageToChat = (text, sender, isHtml = false) => {
                 const messageDiv = document.createElement('div');
@@ -91,18 +91,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return messageDiv;
             };
             
-            const createBookCardForChat = (book) => {
+            const createBookCardForChat = (book, recommendationText) => {
                 if (!book) return '';
                 return `
                     <div class="book-card-chat">
                         <img src="${book.coverUrl}" alt="${book.title}">
                         <h4>${book.title}</h4>
                         <p><strong>Автор:</strong> ${book.author}</p>
-                        <p>${book.annotation.substring(0, 80)}...</p>
+                        <p>${recommendationText}</p> 
                         <a href="book.html?id=${book.id}" class="btn" target="_blank">Детальніше</a>
                     </div>`;
             };
-
+            
             const constructGeminiPrompt = (userQuery) => {
                 const bookContextString = JSON.stringify(bookDatabase.map(b => ({
                     id: b.id,
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     categories: b.categories
                 })));
 
-                return `You are a helpful Ukrainian-speaking library assistant named "Нейро-Бібліотекар".
+                return `You are a creative and conversational Ukrainian-speaking library assistant named "Нейро-Бібліотекар".
                 Your task is to analyze the user's request and the provided book database.
                 Your response MUST be a valid JSON object.
 
@@ -122,11 +122,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 The user's request is: "${userQuery}"
 
                 RULES:
-                1. If you can find relevant books, your response MUST be a JSON object with a "recommendations" key. The value should be an array of objects, where each object has an "id" (from the book list) and a "comment" (your short reason for the recommendation in Ukrainian).
-                   Example: {"recommendations": [{"id": "clean-code", "comment": "Це чудова книга для програмістів."}]}
-                2. If you cannot find any relevant books, or if the user's request is just a greeting or a general question, your response MUST be a JSON object with a "conversation" key. The value should be a friendly, helpful message in Ukrainian.
-                   Example for no books found: {"conversation": "На жаль, я не знайшов нічого схожого. Можете уточнити запит?"}
-                   Example for a greeting: {"conversation": "Вітаю! Чим можу допомогти?"}
+                1. If you find relevant books, your response MUST be a JSON object with a "recommendations" key. The value should be an array of objects.
+                   Each object MUST contain two keys:
+                   - "id": The ID of the book from the provided list.
+                   - "recommendation_text": A NEW, ORIGINAL, and engaging description (2-4 sentences in Ukrainian) explaining WHY this book is a good match for the user's request. DO NOT simply copy the annotation. Be creative, like a real librarian giving a personal recommendation.
+                   Example: {"recommendations": [{"id": "dune", "recommendation_text": "Оскільки ви шукали епічну фантастику, 'Дюна' – це саме те, що треба! Це не просто книга, а цілий всесвіт з глибокою політикою, філософією та незабутньою атмосферою пустельної планети. Вона змусить вас замислитись."}]}
+                
+                2. If you cannot find any relevant books, or if the user is just greeting you or asking a general question, your response MUST be a JSON object with a "conversation" key. The value should be a friendly, helpful message in Ukrainian.
+                   Example: {"conversation": "Вітаю! Радий допомогти вам у пошуку ідеальної книги. Що вас цікавить сьогодні?"}
                 `;
             };
 
@@ -152,19 +155,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                     
                     const jsonResponse = await response.json();
                     loadingMessage.remove();
-
+                    
                     if (jsonResponse.recommendations && Array.isArray(jsonResponse.recommendations)) {
-                        let responseHtml = `<p>Ось що я знайшов для вас:</p>`;
+                        let introductoryMessage = "Гаразд, я переглянув наші архіви і думаю, що вам може сподобатися ось це:";
+                        if (jsonResponse.recommendations.length > 1) {
+                           introductoryMessage = "Я знайшов кілька варіантів, які можуть вас зацікавити:";
+                        }
+                        addMessageToChat(introductoryMessage, 'ai');
+
+                        let responseHtml = '';
                         jsonResponse.recommendations.forEach(rec => {
                             const book = bookDatabase.find(b => b.id === rec.id);
                             if (book) {
-                                if (rec.comment) {
-                                    responseHtml += `<p><em>«${rec.comment}»</em></p>`;
-                                }
-                                responseHtml += createBookCardForChat(book);
+                                responseHtml += createBookCardForChat(book, rec.recommendation_text);
                             }
                         });
-                        addMessageToChat(responseHtml, 'ai', true);
+                        if (responseHtml) {
+                            addMessageToChat(responseHtml, 'ai', true);
+                        }
                     } else if (jsonResponse.conversation) {
                         addMessageToChat(jsonResponse.conversation, 'ai');
                     } else {
@@ -192,7 +200,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         
-        // ... (остальной код script.js остается без изменений) ...
         if (currentPath === 'profile.html') {
             const showLoginBtn = document.getElementById('show-login');
             const showRegisterBtn = document.getElementById('show-register');
