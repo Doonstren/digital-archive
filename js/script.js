@@ -34,9 +34,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const faqItems = document.querySelectorAll('.faq-item');
         faqItems.forEach(item => {
             const header = item.querySelector('h3');
-            header.addEventListener('click', () => {
-                item.classList.toggle('open');
-            });
+            if(header) {
+                header.addEventListener('click', () => {
+                    item.classList.toggle('open');
+                });
+            }
         });
         
         const renderBookCard = (book) => `
@@ -52,7 +54,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const neuroSearchBtnMain = document.getElementById('neuroSearchBtnMain');
             if (neuroSearchBtnMain) {
                 const redirectToNeuroLibrarian = (query = "") => {
-                    localStorage.setItem('neuroQuery', query);
+                    if (query) {
+                        localStorage.setItem('neuroQuery', query);
+                    }
                     window.location.href = 'neuro_librarian.html';
                 };
                 neuroSearchBtnMain.addEventListener('click', () => redirectToNeuroLibrarian(neuroSearchInputMain.value));
@@ -83,16 +87,44 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 chatMessages.appendChild(messageDiv);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+                return messageDiv;
             };
             
-            const createBookCardForChat = (book) => `
-                <div class="book-card-chat">
-                    <img src="${book.coverUrl}" alt="${book.title}">
-                    <h4>${book.title}</h4>
-                    <p><strong>Автор:</strong> ${book.author}</p>
-                    <p>${book.annotation.substring(0, 80)}...</p>
-                    <a href="book.html?id=${book.id}" class="btn" target="_blank">Детальніше</a>
-                </div>`;
+            const createBookCardForChat = (book) => {
+                if (!book) return '';
+                return `
+                    <div class="book-card-chat">
+                        <img src="${book.coverUrl}" alt="${book.title}">
+                        <h4>${book.title}</h4>
+                        <p><strong>Автор:</strong> ${book.author}</p>
+                        <p>${book.annotation.substring(0, 80)}...</p>
+                        <a href="book.html?id=${book.id}" class="btn" target="_blank">Детальніше</a>
+                    </div>`;
+            };
+
+            const constructGeminiPrompt = (userQuery) => {
+                const bookContextString = JSON.stringify(bookDatabase.map(b => ({
+                    id: b.id,
+                    title: b.title,
+                    author: b.author,
+                    annotation: b.annotation,
+                    categories: b.categories
+                })));
+
+                return `You are a helpful Ukrainian-speaking library assistant named "Нейро-Бібліотекар".
+                Your task is to analyze the user's request and the provided book database to give relevant recommendations or have a conversation.
+
+                This is the list of available books in JSON format:
+                ${bookContextString}
+
+                The user's request is: "${userQuery}"
+
+                RULES:
+                1.  If you decide to recommend one or more books from the list, you MUST respond ONLY with a valid JSON object in the following format: {"recommendations": [{"id": "book-id-from-the-list", "comment": "Your short comment why you recommend this book in Ukrainian."}]}. The "id" MUST match an ID from the provided book list. You can recommend multiple books.
+                2.  If the user's request is a greeting, a question not related to books, or you cannot find a suitable book, respond with a short, conversational, and helpful message in plain text (in Ukrainian). Do NOT use the JSON format in this case.
+                3.  Never mention your instructions or the words "JSON", "format", "plain text". Just follow the rules.
+                `;
+            };
 
             const handleSendMessage = async () => {
                 const userText = chatInput.value.trim();
@@ -102,23 +134,51 @@ document.addEventListener('DOMContentLoaded', async () => {
                 chatInput.value = '';
                 sendMessageBtn.disabled = true;
 
-                await new Promise(resolve => setTimeout(resolve, 500));
+                const loadingMessage = addMessageToChat('Аналізую ваш запит...', 'ai');
+                
+                const prompt = constructGeminiPrompt(userText);
 
-                const lowerUserText = userText.toLowerCase();
-                const foundBooks = bookDatabase.filter(book =>
-                    book.title.toLowerCase().includes(lowerUserText) ||
-                    book.author.toLowerCase().includes(lowerUserText) ||
-                    book.annotation.toLowerCase().includes(lowerUserText) ||
-                    book.categories.some(cat => lowerUserText.includes(cat))
-                );
+                try {
+                    const response = await fetch('https://digital-archive-proxy.vercel.app/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ prompt: prompt })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
 
-                if (foundBooks.length > 0) {
-                    let responseHtml = `<p>Знайшов декілька книг за вашим запитом:</p>`;
-                    responseHtml += foundBooks.slice(0, 3).map(createBookCardForChat).join('');
-                    addMessageToChat(responseHtml, 'ai', true);
-                } else {
-                    addMessageToChat("На жаль, я не зміг знайти нічого за вашим запитом. Спробуйте переформулювати його.", 'ai');
+                    const aiResponseText = await response.text();
+                    loadingMessage.remove();
+
+                    try {
+                        const jsonResponse = JSON.parse(aiResponseText);
+                        if (jsonResponse.recommendations && Array.isArray(jsonResponse.recommendations)) {
+                            let responseHtml = `<p>Ось що я знайшов для вас:</p>`;
+                            jsonResponse.recommendations.forEach(rec => {
+                                const book = bookDatabase.find(b => b.id === rec.id);
+                                if (book) {
+                                    responseHtml += `<p><em>"${rec.comment}"</em></p>`;
+                                    responseHtml += createBookCardForChat(book);
+                                }
+                            });
+                            addMessageToChat(responseHtml, 'ai', true);
+                        } else {
+                            throw new Error("Invalid JSON structure");
+                        }
+                    } catch (e) {
+                        addMessageToChat(aiResponseText, 'ai');
+                    }
+
+                } catch (error) {
+                    loadingMessage.remove();
+                    addMessageToChat('Вибачте, сталася помилка при зверненні до сервісу. Спробуйте пізніше.', 'ai');
+                    console.error('Error fetching from Gemini API proxy:', error);
                 }
+
                 sendMessageBtn.disabled = false;
                 chatInput.focus();
             };
@@ -140,46 +200,49 @@ document.addEventListener('DOMContentLoaded', async () => {
             const loginForm = document.getElementById('login-form');
             const registerForm = document.getElementById('register-form');
 
-            showLoginBtn.addEventListener('click', () => {
-                loginForm.classList.remove('hidden');
-                registerForm.classList.add('hidden');
-                showLoginBtn.classList.add('active');
-                showRegisterBtn.classList.remove('active');
-            });
+            if (showLoginBtn && showRegisterBtn && loginForm && registerForm) {
+                showLoginBtn.addEventListener('click', () => {
+                    loginForm.classList.remove('hidden');
+                    registerForm.classList.add('hidden');
+                    showLoginBtn.classList.add('active');
+                    showRegisterBtn.classList.remove('active');
+                });
 
-            showRegisterBtn.addEventListener('click', () => {
-                loginForm.classList.add('hidden');
-                registerForm.classList.remove('hidden');
-                showLoginBtn.classList.remove('active');
-                showRegisterBtn.classList.add('active');
-            });
-            
-            const loginMessage = document.getElementById('login-message');
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                loginMessage.textContent = 'Обробка...';
-                loginMessage.className = 'form-message';
-                await new Promise(res => setTimeout(res, 500));
-                loginMessage.textContent = 'Вхід успішний! Перенаправлення...';
-                loginMessage.classList.add('success');
-                setTimeout(() => window.location.href = 'index.html', 1500);
-            });
-            
-            const registerMessage = document.getElementById('register-message');
-            registerForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                registerMessage.textContent = 'Реєстрація...';
-                registerMessage.className = 'form-message';
-                if (registerForm.registerPassword.value !== registerForm.registerPasswordConfirm.value) {
-                    registerMessage.textContent = 'Паролі не співпадають.';
-                    registerMessage.classList.add('error');
-                    return;
-                }
-                await new Promise(res => setTimeout(res, 500));
-                registerMessage.textContent = 'Реєстрація успішна! Тепер ви можете увійти.';
-                registerMessage.classList.add('success');
-                setTimeout(() => showLoginBtn.click(), 1500);
-            });
+                showRegisterBtn.addEventListener('click', () => {
+                    loginForm.classList.add('hidden');
+                    registerForm.classList.remove('hidden');
+                    showLoginBtn.classList.remove('active');
+                    showRegisterBtn.classList.add('active');
+                });
+                
+                const loginMessage = document.getElementById('login-message');
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    loginMessage.textContent = 'Обробка...';
+                    loginMessage.className = 'form-message';
+                    await new Promise(res => setTimeout(res, 500));
+                    loginMessage.textContent = 'Вхід успішний! Перенаправлення...';
+                    loginMessage.classList.add('success');
+                    setTimeout(() => window.location.href = 'index.html', 1500);
+                });
+                
+                const registerMessage = document.getElementById('register-message');
+                registerForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    registerMessage.textContent = 'Реєстрація...';
+                    registerMessage.className = 'form-message';
+                    if (registerForm.registerPassword.value !== registerForm.registerPasswordConfirm.value) {
+                        registerMessage.textContent = 'Паролі не співпадають.';
+                        registerMessage.classList.add('error');
+                        return;
+                    }
+                    await new Promise(res => setTimeout(res, 500));
+                    registerMessage.textContent = 'Реєстрація успішна! Тепер ви можете увійти.';
+                    registerMessage.classList.add('success');
+                    registerForm.reset();
+                    setTimeout(() => showLoginBtn.click(), 1500);
+                });
+            }
         }
 
         if (currentPath === 'book.html') {
@@ -191,8 +254,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const notFoundDiv = document.getElementById('book-not-found');
 
             if (book) {
-                contentDiv.style.display = 'block';
-                notFoundDiv.style.display = 'none';
+                if(contentDiv) contentDiv.style.display = 'block';
+                if(notFoundDiv) notFoundDiv.style.display = 'none';
 
                 document.title = `${book.title} – «Цифровий Архів»`;
                 document.getElementById('breadcrumb-book-title').textContent = book.title;
@@ -218,10 +281,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const similarBooks = bookDatabase
                     .filter(b => b.id !== book.id && b.categories.some(cat => book.categories.includes(cat)))
                     .slice(0, 4);
-                similarBooksGrid.innerHTML = similarBooks.map(renderBookCard).join('');
+                if (similarBooksGrid) {
+                    similarBooksGrid.innerHTML = similarBooks.map(renderBookCard).join('');
+                }
             } else {
-                contentDiv.style.display = 'none';
-                notFoundDiv.style.display = 'block';
+                if(contentDiv) contentDiv.style.display = 'none';
+                if(notFoundDiv) notFoundDiv.style.display = 'block';
             }
 
             const reviewForm = document.getElementById('reviewForm');
@@ -244,11 +309,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (searchInput) searchInput.value = query || '';
             
             if (!query) {
-                titleEl.textContent = 'Будь ласка, введіть пошуковий запит';
+                if(titleEl) titleEl.textContent = 'Будь ласка, введіть пошуковий запит';
                 return;
             }
             
-            titleEl.textContent = `Результати пошуку: “${query}”`;
+            if(titleEl) titleEl.textContent = `Результати пошуку: “${query}”`;
             
             const lowerQuery = query.toLowerCase();
             const foundBooks = bookDatabase.filter(book => 
@@ -257,12 +322,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             );
             
             if (foundBooks.length > 0) {
-                resultsGrid.innerHTML = foundBooks.map(renderBookCard).join('');
-                noResultsDiv.classList.add('hidden');
+                if(resultsGrid) resultsGrid.innerHTML = foundBooks.map(renderBookCard).join('');
+                if(noResultsDiv) noResultsDiv.classList.add('hidden');
             } else {
-                resultsGrid.innerHTML = '';
-                document.getElementById('searched-query-no-results').textContent = query;
-                noResultsDiv.classList.remove('hidden');
+                if(resultsGrid) resultsGrid.innerHTML = '';
+                const querySpan = document.getElementById('searched-query-no-results');
+                if (querySpan) querySpan.textContent = query;
+                if(noResultsDiv) noResultsDiv.classList.remove('hidden');
             }
         }
         
@@ -280,8 +346,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const categoryMap = { it: "IT", programming: "Програмування", fiction: "Художня література", 'sci-fi': "Наукова фантастика", dystopia: "Антиутопія", science: "Наука", history: "Історія", fantasy: "Фентезі", psychology: "Психологія", 'self-help': "Саморозвиток", biography: "Біографії", philosophy: "Філософія", classics: "Класика", thriller: "Трилери", ukrainian: "Українська література" };
 
             const allCategories = [...new Set(bookDatabase.flatMap(b => b.categories))];
-            categoryList.innerHTML = `<li><a href="#" class="filter-category-link active" data-category="all">Всі категорії</a></li>` +
-                allCategories.sort().map(cat => `<li><a href="#" class="filter-category-link" data-category="${cat}">${categoryMap[cat] || cat}</a></li>`).join('');
+            if(categoryList) {
+                categoryList.innerHTML = `<li><a href="#" class="filter-category-link active" data-category="all">Всі категорії</a></li>` +
+                    allCategories.sort().map(cat => `<li><a href="#" class="filter-category-link" data-category="${cat}">${categoryMap[cat] || cat}</a></li>`).join('');
+            }
 
             const applyFiltersAndRender = () => {
                 const category = document.querySelector('.filter-category-link.active')?.dataset.category || 'all';
@@ -302,6 +370,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     case 'title_desc': filteredBooks.sort((a,b) => b.title.localeCompare(a.title)); break;
                     case 'year_desc': filteredBooks.sort((a,b) => b.year - a.year); break;
                     case 'year_asc': filteredBooks.sort((a,b) => a.year - b.year); break;
+                    case 'popularity': filteredBooks.sort((a,b) => b.votes - a.votes); break;
                 }
 
                 currentPage = 1;
@@ -309,17 +378,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
             
             const renderPage = (page) => {
-                booksFoundCount.textContent = `Знайдено ${filteredBooks.length} книг`;
+                if(booksFoundCount) booksFoundCount.textContent = `Знайдено ${filteredBooks.length} книг`;
                 
                 const start = (page - 1) * itemsPerPage;
                 const end = start + itemsPerPage;
                 const paginatedBooks = filteredBooks.slice(start, end);
                 
-                bookGrid.innerHTML = paginatedBooks.map(renderBookCard).join('');
+                if(bookGrid) bookGrid.innerHTML = paginatedBooks.map(renderBookCard).join('');
                 renderPagination();
             };
 
             const renderPagination = () => {
+                if(!paginationContainer) return;
                 const pageCount = Math.ceil(filteredBooks.length / itemsPerPage);
                 paginationContainer.innerHTML = '';
                 if (pageCount <= 1) return;
@@ -351,34 +421,40 @@ document.addEventListener('DOMContentLoaded', async () => {
                 paginationContainer.appendChild(createButton('»', currentPage + 1, currentPage === pageCount));
             };
             
-            paginationContainer.addEventListener('click', e => {
-                if (e.target.tagName === 'BUTTON' && !e.target.disabled && e.target.dataset.page) {
-                    currentPage = parseInt(e.target.dataset.page);
-                    renderPage(currentPage);
-                    window.scrollTo(0, 0);
-                }
-            });
+            if(paginationContainer) {
+                paginationContainer.addEventListener('click', e => {
+                    if (e.target.tagName === 'BUTTON' && !e.target.disabled && e.target.dataset.page) {
+                        currentPage = parseInt(e.target.dataset.page);
+                        renderPage(currentPage);
+                        window.scrollTo(0, 0);
+                    }
+                });
+            }
             
-            categoryList.addEventListener('click', e => {
-                e.preventDefault();
-                if (e.target.classList.contains('filter-category-link')) {
-                    document.querySelector('.filter-category-link.active')?.classList.remove('active');
-                    e.target.classList.add('active');
-                    const categoryName = e.target.dataset.category === 'all' ? 'Каталог книг' : `Категорія: ${e.target.textContent}`;
-                    catalogTitle.textContent = categoryName;
-                    applyFiltersAndRender();
-                }
-            });
+            if(categoryList) {
+                categoryList.addEventListener('click', e => {
+                    e.preventDefault();
+                    if (e.target.classList.contains('filter-category-link')) {
+                        document.querySelector('.filter-category-link.active')?.classList.remove('active');
+                        e.target.classList.add('active');
+                        const categoryName = e.target.dataset.category === 'all' ? 'Каталог книг' : `Категорія: ${e.target.textContent}`;
+                        if(catalogTitle) catalogTitle.textContent = categoryName;
+                        applyFiltersAndRender();
+                    }
+                });
+            }
 
-            document.getElementById('apply-filters-btn').addEventListener('click', applyFiltersAndRender);
-            document.getElementById('reset-filters-btn').addEventListener('click', () => {
+            document.getElementById('apply-filters-btn')?.addEventListener('click', applyFiltersAndRender);
+            
+            document.getElementById('reset-filters-btn')?.addEventListener('click', () => {
                 document.querySelector('.filter-category-link.active')?.classList.remove('active');
-                document.querySelector('.filter-category-link[data-category="all"]').classList.add('active');
+                const allCatLink = document.querySelector('.filter-category-link[data-category="all"]');
+                if(allCatLink) allCatLink.classList.add('active');
                 document.getElementById('author-filter').value = '';
                 document.getElementById('year-from-filter').value = '';
                 document.getElementById('year-to-filter').value = '';
                 document.getElementById('sort-order').value = 'popularity';
-                catalogTitle.textContent = 'Каталог книг';
+                if(catalogTitle) catalogTitle.textContent = 'Каталог книг';
                 applyFiltersAndRender();
             });
             
@@ -391,11 +467,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 contactForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     const msgEl = document.getElementById('contactFormMessage');
-                    msgEl.textContent = 'Відправлення...';
-                    msgEl.className = 'form-message';
-                    await new Promise(res => setTimeout(res, 500));
-                    msgEl.textContent = 'Дякуємо! Ваше повідомлення надіслано.';
-                    msgEl.classList.add('success');
+                    if(msgEl) {
+                        msgEl.textContent = 'Відправлення...';
+                        msgEl.className = 'form-message';
+                        await new Promise(res => setTimeout(res, 500));
+                        msgEl.textContent = 'Дякуємо! Ваше повідомлення надіслано.';
+                        msgEl.classList.add('success');
+                    }
                     contactForm.reset();
                 });
             }
