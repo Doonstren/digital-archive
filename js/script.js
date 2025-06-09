@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <a class="btn" href="book.html?id=${book.id}">Детальніше</a>
             </article>`;
 
-        if (currentPath === 'index.html') {
+        if (currentPath === 'index.html' || currentPath === '') {
             const neuroSearchInputMain = document.getElementById('neuroSearchInputMain');
             const neuroSearchBtnMain = document.getElementById('neuroSearchBtnMain');
             if (neuroSearchBtnMain) {
