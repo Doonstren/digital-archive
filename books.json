@@ -448,5 +448,20 @@
         "votes": 190,
         "annotation": "Герман повертається до рідного містечка на Луганщині, щоб знайти зниклого брата і захистити його бізнес — стару бензоколонку. Роман про повернення, дружбу та боротьбу за своє.",
         "filePathPDF": "books/voroshilovgrad.pdf"
+    },
+    {
+        "id": "haiky",
+        "title": "Хайку",
+        "author": "Дмитро Зозуля",
+        "year": 2025,
+        "categories": ["fiction", "ukrainian"],
+        "coverUrl": "img/haiky-cover.png",
+        "publisher": "SDI",
+        "pages": 13,
+        "language": "Українська",
+        "rating": 5,
+        "votes": 252316,
+        "annotation": "Збірник Хайку написаних великим китайським філософом 深入觀察",
+        "filePathPDF": "books/haiky.pdf"
     }
 ]
