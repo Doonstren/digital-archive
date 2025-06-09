@@ -22,7 +22,7 @@
       </ul>
     </nav>
     <div class="header-actions">
-      <a href="neuro_librarian.html" class="btn btn-neuro-header">Нейро-Бібліотекар</a>
+      <a href="neuro_librarian.html" class="btn btn-neuro-header btn-neuro-header-small">Нейро-Бібліотекар</a>
       <form class="search-form" action="search.html" method="get">
         <input type="search" name="q" placeholder="Пошук..." aria-label="Пошук книг">
         <button type="submit">Знайти</button>
@@ -51,8 +51,16 @@
 
   <div class="container">
     <section>
-      <h2>Нові надходження</h2>
-      <div class="book-grid" id="new-arrivals-grid">
+      <div class="section-header">
+        <h2>Нові надходження</h2>
+        <div class="carousel-controls">
+          <button id="carousel-prev" class="carousel-btn">‹</button>
+          <button id="carousel-next" class="carousel-btn">›</button>
+        </div>
+      </div>
+      <div class="carousel-container">
+        <div class="carousel-track" id="new-arrivals-carousel">
+        </div>
       </div>
     </section>
 
@@ -61,10 +69,10 @@
       <ul class="category-list">
         <li><a href="catalog.html?category=it">Інформаційні технології</a></li>
         <li><a href="catalog.html?category=history">Історія</a></li>
-        <li><a href="catalog.html?category=art">Мистецтво</a></li>
         <li><a href="catalog.html?category=fiction">Художня література</a></li>
         <li><a href="catalog.html?category=science">Наука</a></li>
         <li><a href="catalog.html?category=psychology">Психологія</a></li>
+        <li><a href="catalog.html?category=fantasy">Фентезі</a></li>
       </ul>
     </section>
   </div>
