@@ -54,14 +54,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
         
-        const faqItems = document.querySelectorAll('.faq-item');
-        faqItems.forEach(item => {
-            const header = item.querySelector('h3');
-            if(header) {
-                header.addEventListener('click', () => {
-                    item.classList.toggle('open');
-                });
-            }
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                header.parentElement.classList.toggle('open');
+            });
         });
         
         const renderBookCard = (book) => `
@@ -99,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let isDown = false;
                 let startX;
                 let scrollLeft;
-
+                
                 function updateCarouselButtons() {
                     const maxTranslate = 0;
                     const minTranslate = carouselContainer.offsetWidth - carouselTrack.scrollWidth;
@@ -113,49 +109,89 @@ document.addEventListener('DOMContentLoaded', async () => {
                     currentTranslate += amount;
                     if (currentTranslate > maxTranslate) currentTranslate = maxTranslate;
                     if (currentTranslate < minTranslate) currentTranslate = minTranslate;
+                    carouselTrack.style.transition = 'transform 0.5s ease-out';
                     carouselTrack.style.transform = `translateX(${currentTranslate}px)`;
                     updateCarouselButtons();
                 }
 
                 prevBtn.addEventListener('click', () => moveCarousel(244));
                 nextBtn.addEventListener('click', () => moveCarousel(-244));
-                
+
                 carouselContainer.addEventListener('mousedown', (e) => {
                     isDown = true;
                     carouselContainer.classList.add('grabbing');
                     startX = e.pageX - carouselContainer.offsetLeft;
                     scrollLeft = currentTranslate;
+                    carouselTrack.style.transition = 'none';
                 });
                 
-                carouselContainer.addEventListener('mouseleave', () => {
+                const stopDragging = () => {
+                    if (!isDown) return;
                     isDown = false;
                     carouselContainer.classList.remove('grabbing');
-                });
-                
-                carouselContainer.addEventListener('mouseup', () => {
-                    isDown = false;
-                    carouselContainer.classList.remove('grabbing');
-                });
+                    carouselTrack.style.transition = 'transform 0.5s ease-out';
+                };
+
+                carouselContainer.addEventListener('mouseleave', stopDragging);
+                carouselContainer.addEventListener('mouseup', stopDragging);
                 
                 carouselContainer.addEventListener('mousemove', (e) => {
                     if (!isDown) return;
                     e.preventDefault();
                     const x = e.pageX - carouselContainer.offsetLeft;
-                    const walk = x - startX;
-                    const newTranslate = scrollLeft + walk;
+                    const walk = (x - startX);
                     
                     const maxTranslate = 0;
                     const minTranslate = carouselContainer.offsetWidth - carouselTrack.scrollWidth;
+                    
+                    let newTranslate = scrollLeft + walk;
+                    if(newTranslate > maxTranslate) newTranslate = maxTranslate;
+                    if(newTranslate < minTranslate) newTranslate = minTranslate;
 
-                    if(newTranslate <= maxTranslate && newTranslate >= minTranslate) {
-                        currentTranslate = newTranslate;
-                        carouselTrack.style.transform = `translateX(${currentTranslate}px)`;
-                        updateCarouselButtons();
-                    }
+                    currentTranslate = newTranslate;
+                    carouselTrack.style.transform = `translateX(${currentTranslate}px)`;
+                    updateCarouselButtons();
                 });
 
                 window.addEventListener('resize', updateCarouselButtons);
                 updateCarouselButtons();
+            }
+        }
+        
+        if (currentPath === 'search.html') {
+            const params = new URLSearchParams(window.location.search);
+            const query = params.get('q');
+            
+            const titleEl = document.getElementById('search-results-title');
+            const resultsGrid = document.getElementById('search-results-grid');
+            const noResultsDiv = document.getElementById('search-no-results');
+            const searchInput = document.getElementById('header-search-input');
+            
+            if (searchInput) searchInput.value = query || '';
+            
+            if (!query) {
+                if(titleEl) titleEl.textContent = 'Будь ласка, введіть пошуковий запит';
+                if(noResultsDiv) noResultsDiv.classList.remove('hidden');
+                if(document.getElementById('searched-query-no-results')) document.getElementById('searched-query-no-results').textContent = '...';
+                return;
+            }
+            
+            if(titleEl) titleEl.textContent = `Результати пошуку: “${query}”`;
+            
+            const lowerQuery = query.toLowerCase();
+            const foundBooks = bookDatabase.filter(book => 
+                book.title.toLowerCase().includes(lowerQuery) ||
+                book.author.toLowerCase().includes(lowerQuery)
+            );
+            
+            if (foundBooks.length > 0) {
+                if(resultsGrid) resultsGrid.innerHTML = foundBooks.map(renderBookCard).join('');
+                if(noResultsDiv) noResultsDiv.classList.add('hidden');
+            } else {
+                if(resultsGrid) resultsGrid.innerHTML = '';
+                const querySpan = document.getElementById('searched-query-no-results');
+                if (querySpan) querySpan.textContent = query;
+                if(noResultsDiv) noResultsDiv.classList.remove('hidden');
             }
         }
 
@@ -286,58 +322,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             
             applyFiltersAndRender();
-        }
-
-        // Остальной код остается без изменений, кроме блока profile.html
-        if (currentPath === 'profile.html') {
-            const showLoginBtn = document.getElementById('show-login');
-            const showRegisterBtn = document.getElementById('show-register');
-            const loginForm = document.getElementById('login-form');
-            const registerForm = document.getElementById('register-form');
-
-            if (showLoginBtn && showRegisterBtn && loginForm && registerForm) {
-                showLoginBtn.addEventListener('click', () => {
-                    loginForm.classList.remove('hidden');
-                    registerForm.classList.add('hidden');
-                    showLoginBtn.classList.add('active');
-                    showRegisterBtn.classList.remove('active');
-                });
-
-                showRegisterBtn.addEventListener('click', () => {
-                    loginForm.classList.add('hidden');
-                    registerForm.classList.remove('hidden');
-                    showLoginBtn.classList.remove('active');
-                    showRegisterBtn.classList.add('active');
-                });
-                
-                const loginMessage = document.getElementById('login-message');
-                loginForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    loginMessage.textContent = 'Обробка...';
-                    loginMessage.className = 'form-message';
-                    await new Promise(res => setTimeout(res, 500));
-                    loginMessage.textContent = 'Вхід успішний! Перенаправлення...';
-                    loginMessage.classList.add('success');
-                    setTimeout(() => window.location.href = 'index.html', 1500);
-                });
-                
-                const registerMessage = document.getElementById('register-message');
-                registerForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    registerMessage.textContent = 'Реєстрація...';
-                    registerMessage.className = 'form-message';
-                    if (registerForm.registerPassword.value !== registerForm.registerPasswordConfirm.value) {
-                        registerMessage.textContent = 'Паролі не співпадають.';
-                        registerMessage.classList.add('error');
-                        return;
-                    }
-                    await new Promise(res => setTimeout(res, 500));
-                    registerMessage.textContent = 'Реєстрація успішна! Тепер ви можете увійти.';
-                    registerMessage.classList.add('success');
-                    registerForm.reset();
-                    setTimeout(() => showLoginBtn.click(), 1500);
-                });
-            }
         }
     }
 });

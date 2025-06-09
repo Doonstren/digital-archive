@@ -22,7 +22,7 @@
       </ul>
     </nav>
     <div class="header-actions">
-      <a href="neuro_librarian.html" class="btn btn-neuro-header">Нейро-Бібліотекар</a>
+      <a href="neuro_librarian.html" class="btn btn-neuro-header btn-neuro-header-small">Нейро-Бібліотекар</a>
       <form class="search-form" action="search.html" method="get">
         <input type="search" name="q" placeholder="Пошук..." aria-label="Пошук книг">
         <button type="submit">Знайти</button>
@@ -43,50 +43,51 @@
     </nav>
     <h1>Контактна інформація</h1>
 
-    <section class="contact-info-section">
-        <div class="contact-block">
+    <div class="contact-layout-container">
+        <section class="form-section">
+            <h2>Форма зворотного зв'язку</h2>
+            <p>Маєте запитання або пропозиції? Напишіть нам!</p>
+            <form id="contactForm">
+              <div class="form-group">
+                <label for="contactName">Ваше ім'я:</label>
+                <input type="text" id="contactName" name="contactName" required>
+              </div>
+              <div class="form-group">
+                <label for="contactEmail">Ваш Email:</label>
+                <input type="email" id="contactEmail" name="contactEmail" required>
+              </div>
+              <div class="form-group">
+                <label for="contactSubject">Тема повідомлення:</label>
+                <input type="text" id="contactSubject" name="contactSubject">
+              </div>
+              <div class="form-group">
+                <label for="contactMessage">Повідомлення:</label>
+                <textarea id="contactMessage" name="contactMessage" rows="5" required></textarea>
+              </div>
+              <button type="submit" class="btn">Надіслати повідомлення</button>
+              <p id="contactFormMessage" class="form-message"></p>
+            </form>
+        </section>
+
+        <aside class="info-section">
             <h2>Наші координати</h2>
-            <p><strong>Замовник: ТОВ "Освітній Простір"</strong></p>
-            <p><strong>Адреса:</strong> м. Київ, вул. Знань, 1</p>
-            <p><strong>Телефон:</strong> <a href="tel:+380000000000">+380 00 000 00 00</a></p>
-            <p><strong>Email:</strong> <a href="mailto:info@osvitniyprostir.example.com">info@osvitniyprostir.example.com</a></p>
-        </div>
-        <div class="contact-block">
-            <p><strong>Розробник: ТОВ "ТехноКнига"</strong></p>
-            <p><strong>Адреса:</strong> м. Львів, вул. Розробників, 10</p>
-            <p><strong>Телефон:</strong> <a href="tel:+380111111111">+380 11 111 11 11</a></p>
-            <p><strong>Email:</strong> <a href="mailto:support@technoknyga.example.com">support@technoknyga.example.com</a></p>
-        </div>
-    </section>
-
-    <div id="map" class="map-placeholder">
-      Інтерактивна карта буде тут (Google Maps API)
+            <div class="contact-block">
+                <p><strong>Замовник: ТОВ "Освітній Простір"</strong></p>
+                <p><strong>Адреса:</strong> м. Київ, вул. Знань, 1</p>
+                <p><strong>Телефон:</strong> <a href="tel:+380000000000">+380 00 000 00 00</a></p>
+                <p><strong>Email:</strong> <a href="mailto:info@osvitniyprostir.example.com">info@osvitniyprostir.example.com</a></p>
+            </div>
+            <div class="contact-block">
+                <p><strong>Розробник: ТОВ "ТехноКнига"</strong></p>
+                <p><strong>Адреса:</strong> м. Львів, вул. Розробників, 10</p>
+                <p><strong>Телефон:</strong> <a href="tel:+380111111111">+380 11 111 11 11</a></p>
+                <p><strong>Email:</strong> <a href="mailto:support@technoknyga.example.com">support@technoknyga.example.com</a></p>
+            </div>
+             <div id="map" class="map-placeholder">
+                Інтерактивна карта буде тут
+             </div>
+        </aside>
     </div>
-
-    <section class="feedback-form-section">
-        <h2>Форма зворотного зв'язку</h2>
-        <p>Маєте запитання або пропозиції? Напишіть нам!</p>
-        <form id="contactForm">
-          <div class="form-group">
-            <label for="contactName">Ваше ім'я:</label>
-            <input type="text" id="contactName" name="contactName" required>
-          </div>
-          <div class="form-group">
-            <label for="contactEmail">Ваш Email:</label>
-            <input type="email" id="contactEmail" name="contactEmail" required>
-          </div>
-          <div class="form-group">
-            <label for="contactSubject">Тема повідомлення:</label>
-            <input type="text" id="contactSubject" name="contactSubject">
-          </div>
-          <div class="form-group">
-            <label for="contactMessage">Повідомлення:</label>
-            <textarea id="contactMessage" name="contactMessage" rows="5" required></textarea>
-          </div>
-          <button type="submit" class="btn">Надіслати повідомлення</button>
-          <p id="contactFormMessage" class="form-message"></p>
-        </form>
-    </section>
   </div>
 </main>
 

@@ -269,17 +269,19 @@ main {
 }
 .carousel-container.grabbing {
     cursor: grabbing;
+    user-select: none;
 }
 .carousel-track {
     display: flex;
     gap: 1.5rem;
-    transition: transform 0.5s ease-in-out;
-    pointer-events: none; /* Disable pointer events on track to allow dragging on container */
+    transition: transform 0.5s ease-out;
+    pointer-events: none;
 }
 .carousel-track .book-card {
     flex: 0 0 220px;
-    pointer-events: auto; /* Re-enable pointer events for cards */
+    pointer-events: auto;
 }
+
 .book-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -451,6 +453,65 @@ main {
 .book-card-chat::after { content: ""; display: table; clear: both; }
 .chat-input-area { display: flex; gap: 0.5rem; }
 .chat-input-area input[type="text"] { flex-grow: 1; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: var(--default-radius); }
+
+.accordion-item {
+    border: 1px solid var(--border-color);
+    border-radius: var(--default-radius);
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+.accordion-header {
+    cursor: pointer;
+    padding: 1rem;
+    margin: 0;
+    background-color: var(--bg-alt-color);
+    position: relative;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.accordion-header::after {
+    content: '+';
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    transition: transform 0.2s ease-in-out;
+}
+.accordion-item.open > .accordion-header::after {
+    transform: rotate(45deg);
+}
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+    padding: 0 1rem;
+}
+.accordion-item.open > .accordion-content {
+    max-height: 1000px;
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.contact-layout-container {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+.contact-layout-container > .form-section {
+    flex: 2;
+    min-width: 300px;
+}
+.contact-layout-container > .info-section {
+    flex: 1;
+    min-width: 280px;
+}
+.info-section .contact-block {
+    margin-bottom: 1.5rem;
+}
+.info-section p {
+    margin-bottom: 0.5rem;
+}
 
 .hidden { display: none !important; }
 
