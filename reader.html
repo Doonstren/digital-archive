@@ -89,12 +89,32 @@
             padding: 2rem 1rem;
             text-align: center;
         }
-        #pdf-viewer canvas {
-            display: block;
+        .pdf-page-container {
+            position: relative;
+            display: inline-block;
             margin: 0 auto 1.5rem auto;
-            max-width: 100%;
-            height: auto;
             box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        .pdf-page-container canvas {
+            display: block;
+        }
+        .textLayer {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.2;
+            color: transparent;
+            line-height: 1;
+        }
+        .textLayer ::selection {
+            background: rgba(0, 0, 255, 0.3);
+        }
+        .textLayer > span {
+            position: absolute;
+            white-space: pre;
+            transform-origin: 0% 0%;
         }
         #loader {
             padding: 4rem;
