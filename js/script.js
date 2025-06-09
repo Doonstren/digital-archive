@@ -210,8 +210,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('book-cover-img').alt = `Обкладинка ${book.title}`;
                 document.getElementById('book-formats-list').textContent = book.formats;
 
+                const categoryMap = { it: "IT", programming: "Програмування", fiction: "Художня література", 'sci-fi': "Наукова фантастика", dystopia: "Антиутопія", science: "Наука", history: "Історія", fantasy: "Фентезі", psychology: "Психологія", 'self-help': "Саморозвиток", biography: "Біографії", philosophy: "Філософія", classics: "Класика", thriller: "Трилери", ukrainian: "Українська література" };
                 const genreTagsContainer = document.getElementById('book-genre-tags');
-                genreTagsContainer.innerHTML = book.categories.map(cat => `<a href="catalog.html?category=${cat}">${cat.charAt(0).toUpperCase() + cat.slice(1)}</a>`).join(' ');
+                genreTagsContainer.innerHTML = book.categories.map(cat => `<a href="catalog.html?category=${cat}">${categoryMap[cat] || cat}</a>`).join(' ');
 
                 const similarBooksGrid = document.getElementById('similar-books-grid');
                 const similarBooks = bookDatabase
@@ -276,27 +277,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const itemsPerPage = 12;
             let filteredBooks = [...bookDatabase];
             
-            const categoryMap = {
-                it: "IT",
-                programming: "Програмування",
-                fiction: "Художня література",
-                'sci-fi': "Наукова фантастика",
-                dystopia: "Антиутопія",
-                science: "Наука",
-                history: "Історія",
-                fantasy: "Фентезі",
-                psychology: "Психологія",
-                'self-help': "Саморозвиток",
-                biography: "Біографії",
-                philosophy: "Філософія",
-                classics: "Класика",
-                thriller: "Трилери",
-                ukrainian: "Українська література"
-            };
+            const categoryMap = { it: "IT", programming: "Програмування", fiction: "Художня література", 'sci-fi': "Наукова фантастика", dystopia: "Антиутопія", science: "Наука", history: "Історія", fantasy: "Фентезі", psychology: "Психологія", 'self-help': "Саморозвиток", biography: "Біографії", philosophy: "Філософія", classics: "Класика", thriller: "Трилери", ukrainian: "Українська література" };
 
             const allCategories = [...new Set(bookDatabase.flatMap(b => b.categories))];
             categoryList.innerHTML = `<li><a href="#" class="filter-category-link active" data-category="all">Всі категорії</a></li>` +
-                allCategories.map(cat => `<li><a href="#" class="filter-category-link" data-category="${cat}">${categoryMap[cat] || cat}</a></li>`).join('');
+                allCategories.sort().map(cat => `<li><a href="#" class="filter-category-link" data-category="${cat}">${categoryMap[cat] || cat}</a></li>`).join('');
 
             const applyFiltersAndRender = () => {
                 const category = document.querySelector('.filter-category-link.active')?.dataset.category || 'all';
