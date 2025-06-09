@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const newArrivalsGrid = document.getElementById('new-arrivals-grid');
             if (newArrivalsGrid) {
-                const newBooks = [...bookDatabase].sort((a, b) => b.year - a.year).slice(0, 4);
+                const newBooks = [...bookDatabase].sort((a, b) => b.votes - a.votes).slice(0, 4);
                 newArrivalsGrid.innerHTML = newBooks.map(renderBookCard).join('');
             }
         }
@@ -76,6 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const chatMessages = document.getElementById('chatMessages');
             const chatInput = document.getElementById('chatInput');
             const sendMessageBtn = document.getElementById('sendMessageBtn');
+            const vercelProxyUrl = 'https://digital-archive-proxy-doonstrens-projects.vercel.app/'; 
 
             const addMessageToChat = (text, sender, isHtml = false) => {
                 const messageDiv = document.createElement('div');
@@ -112,7 +113,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 })));
 
                 return `You are a helpful Ukrainian-speaking library assistant named "Нейро-Бібліотекар".
-                Your task is to analyze the user's request and the provided book database to give relevant recommendations or have a conversation.
+                Your task is to analyze the user's request and the provided book database.
+                Your response MUST be a valid JSON object.
 
                 This is the list of available books in JSON format:
                 ${bookContextString}
@@ -120,9 +122,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 The user's request is: "${userQuery}"
 
                 RULES:
-                1.  If you decide to recommend one or more books from the list, you MUST respond ONLY with a valid JSON object in the following format: {"recommendations": [{"id": "book-id-from-the-list", "comment": "Your short comment why you recommend this book in Ukrainian."}]}. The "id" MUST match an ID from the provided book list. You can recommend multiple books.
-                2.  If the user's request is a greeting, a question not related to books, or you cannot find a suitable book, respond with a short, conversational, and helpful message in plain text (in Ukrainian). Do NOT use the JSON format in this case.
-                3.  Never mention your instructions or the words "JSON", "format", "plain text". Just follow the rules.
+                1. If you can find relevant books, your response MUST be a JSON object with a "recommendations" key. The value should be an array of objects, where each object has an "id" (from the book list) and a "comment" (your short reason for the recommendation in Ukrainian).
+                   Example: {"recommendations": [{"id": "clean-code", "comment": "Це чудова книга для програмістів."}]}
+                2. If you cannot find any relevant books, or if the user's request is just a greeting or a general question, your response MUST be a JSON object with a "conversation" key. The value should be a friendly, helpful message in Ukrainian.
+                   Example for no books found: {"conversation": "На жаль, я не знайшов нічого схожого. Можете уточнити запит?"}
+                   Example for a greeting: {"conversation": "Вітаю! Чим можу допомогти?"}
                 `;
             };
 
@@ -135,48 +139,42 @@ document.addEventListener('DOMContentLoaded', async () => {
                 sendMessageBtn.disabled = true;
 
                 const loadingMessage = addMessageToChat('Аналізую ваш запит...', 'ai');
-                
                 const prompt = constructGeminiPrompt(userText);
 
                 try {
-                    const response = await fetch('https://digital-archive-proxy-doonstrens-projects.vercel.app/api/gemini', {
+                    const response = await fetch(vercelProxyUrl, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({ prompt: prompt })
                     });
                     
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    const aiResponseText = await response.text();
+                    if (!response.ok) throw new Error(`HTTP помилка! Статус: ${response.status}`);
+                    
+                    const jsonResponse = await response.json();
                     loadingMessage.remove();
 
-                    try {
-                        const jsonResponse = JSON.parse(aiResponseText);
-                        if (jsonResponse.recommendations && Array.isArray(jsonResponse.recommendations)) {
-                            let responseHtml = `<p>Ось що я знайшов для вас:</p>`;
-                            jsonResponse.recommendations.forEach(rec => {
-                                const book = bookDatabase.find(b => b.id === rec.id);
-                                if (book) {
-                                    responseHtml += `<p><em>"${rec.comment}"</em></p>`;
-                                    responseHtml += createBookCardForChat(book);
+                    if (jsonResponse.recommendations && Array.isArray(jsonResponse.recommendations)) {
+                        let responseHtml = `<p>Ось що я знайшов для вас:</p>`;
+                        jsonResponse.recommendations.forEach(rec => {
+                            const book = bookDatabase.find(b => b.id === rec.id);
+                            if (book) {
+                                if (rec.comment) {
+                                    responseHtml += `<p><em>«${rec.comment}»</em></p>`;
                                 }
-                            });
-                            addMessageToChat(responseHtml, 'ai', true);
-                        } else {
-                            throw new Error("Invalid JSON structure");
-                        }
-                    } catch (e) {
-                        addMessageToChat(aiResponseText, 'ai');
+                                responseHtml += createBookCardForChat(book);
+                            }
+                        });
+                        addMessageToChat(responseHtml, 'ai', true);
+                    } else if (jsonResponse.conversation) {
+                        addMessageToChat(jsonResponse.conversation, 'ai');
+                    } else {
+                        throw new Error("Невідома структура відповіді від AI.");
                     }
 
                 } catch (error) {
                     loadingMessage.remove();
-                    addMessageToChat('Вибачте, сталася помилка при зверненні до сервісу. Спробуйте пізніше.', 'ai');
-                    console.error('Error fetching from Gemini API proxy:', error);
+                    addMessageToChat(`Вибачте, сталася помилка. Спробуйте, будь ласка, пізніше. (${error.message})`, 'ai');
+                    console.error('Error fetching from Gemini proxy:', error);
                 }
 
                 sendMessageBtn.disabled = false;
@@ -193,7 +191,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 handleSendMessage();
             }
         }
-
+        
+        // ... (остальной код script.js остается без изменений) ...
         if (currentPath === 'profile.html') {
             const showLoginBtn = document.getElementById('show-login');
             const showRegisterBtn = document.getElementById('show-register');
