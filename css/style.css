@@ -496,6 +496,34 @@ main {
     padding-left: 1.5rem;
     list-style-position: outside;
 }
+.partner-block {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+.partner-logo {
+    height: 50px;
+    width: auto;
+    flex-shrink: 0;
+}
+.partner-info p {
+    margin: 0;
+}
+.goals-list li::before {
+    content: '✔';
+    color: var(--success-color);
+    position: absolute;
+    left: 0;
+}
+.goals-list {
+    list-style: none;
+    padding-left: 0;
+}
+.goals-list li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.5rem;
+}
 
 .contact-layout-container {
     display: flex;
@@ -516,6 +544,18 @@ main {
 .info-section p {
     margin-bottom: 0.5rem;
 }
+.map-placeholder {
+    height: 200px;
+    background-color: var(--bg-alt-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--default-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--text-muted-color);
+    margin-top: 1rem;
+}
 
 .hidden { display: none !important; }
 
@@ -524,45 +564,9 @@ main {
     color: var(--text-muted-color);
     padding: 1.5rem 0;
     margin-top: auto;
-    text-align: center;
     font-size: 0.9rem;
     border-top: 1px solid var(--border-color);
 }
-.site-footer p { margin-bottom: 0.25rem; }
-.site-footer a { color: var(--text-muted-color); }
-.site-footer a:hover { color: var(--primary-color); }
-
-.accordion-content ul {
-    padding-left: 1.5rem;
-    list-style-position: outside;
-}
-
-.partner-block {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    padding: 1rem;
-    background-color: var(--bg-alt-color);
-    border: 1px solid var(--border-color);
-    border-radius: var(--default-radius);
-}
-
-.partner-logo {
-    height: 50px;
-    width: auto;
-    flex-shrink: 0;
-}
-
-.partner-info p {
-    margin: 0;
-}
-
-.contact-layout-container {
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
-}
-
 .site-footer .container {
     display: flex;
     justify-content: space-between;
@@ -570,20 +574,27 @@ main {
     flex-wrap: wrap; 
     gap: 1rem;
 }
-
 .footer-content {
     text-align: left;
 }
-
+.footer-content p {
+    margin: 0;
+}
+.footer-partner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.footer-partner span {
+    font-weight: 500;
+}
 .footer-partner a {
     display: inline-block;
     transition: transform 0.2s ease;
 }
-
 .footer-partner a:hover {
     transform: scale(1.05);
 }
-
 .footer-partner img {
     height: 35px;
     width: auto;
@@ -609,6 +620,7 @@ main {
     .chat-container { height: calc(100vh - var(--header-height) - 2rem); }
     
     .header-actions .search-form { display: none; }
+    
     .site-footer .container {
         flex-direction: column;
         justify-content: center;

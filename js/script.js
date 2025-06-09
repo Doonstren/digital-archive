@@ -458,139 +458,131 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (currentPath === 'neuro_librarian.html') {
-            // ... (Код для нейро-библиотекаря без изменений) ...
-        }
-        
-        if (currentPath === 'reader.html') {
-            const params = new URLSearchParams(window.location.search);
-            const bookId = params.get('id');
-            const book = bookDatabase.find(b => b.id === bookId);
-
-            const titleHeader = document.getElementById('book-title-header');
-            const loader = document.getElementById('loader');
-            const bookmarkBtn = document.getElementById('bookmark-btn');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatInput = document.getElementById('chatInput');
+            const sendMessageBtn = document.getElementById('sendMessageBtn');
+            const vercelProxyUrl = 'https://digital-archive-proxy-doonstrens-projects.vercel.app/api/gemini';
             
-            if (book && book.filePathPDF) {
-                document.title = `${book.title} – Читалка`;
-                if(titleHeader) titleHeader.textContent = book.title;
+            const bookContextString = JSON.stringify(bookDatabase.map(b => ({
+                id: b.id,
+                title: b.title,
+                author: b.author,
+                annotation: b.annotation,
+                categories: b.categories
+            })));
+
+            const systemInstruction = {
+                role: 'user',
+                parts: [{ text: `You are a creative and conversational Ukrainian-speaking library assistant named "Нейро-Бібліотекар". Your task is to analyze the user's request, the provided chat history, and the book database. Your response MUST be a valid JSON object. This is the list of available books in JSON format: ${bookContextString}. RULES: 1. If you find relevant books, your response MUST be a JSON object with a "recommendations" key. The value should be an array of objects. Each object MUST contain two keys: - "id": The ID of the book from the provided list. - "recommendation_text": A NEW, ORIGINAL, and engaging description (2-4 sentences in Ukrainian) explaining WHY this book is a good match for the user's request. DO NOT simply copy the annotation. Be creative, like a real librarian giving a personal recommendation. 2. If you cannot find any relevant books, or if the user is just greeting you or asking a general question, your response MUST be a JSON object with a "conversation" key. The value should be a friendly, helpful message in Ukrainian.` }]
+            };
+            
+            let chatHistory = [];
+
+            const addMessageToChat = (text, sender, isHtml = false) => {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message', `${sender}-message`);
+                if (isHtml) {
+                    messageDiv.innerHTML = text;
+                } else {
+                    messageDiv.appendChild(document.createTextNode(text));
+                }
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                return messageDiv;
+            };
+            
+            const createBookCardForChat = (book, recommendationText) => {
+                if (!book) return '';
+                return `
+                    <div class="book-card-chat">
+                        <img src="${book.coverUrl}" alt="${book.title}">
+                        <h4>${book.title}</h4>
+                        <p><strong>Автор:</strong> ${book.author}</p>
+                        <p>${recommendationText}</p> 
+                        <a href="book.html?id=${book.id}" class="btn" target="_blank">Детальніше</a>
+                    </div>`;
+            };
+
+            const handleSendMessage = async () => {
+                const userText = chatInput.value.trim();
+                if (!userText) return;
+
+                addMessageToChat(userText, 'user');
+                chatInput.value = '';
+                sendMessageBtn.disabled = true;
                 
-                let bookmarkedPages = JSON.parse(sessionStorage.getItem(`bookmarks_${bookId}`) || '[]');
+                chatHistory.push({ role: 'user', parts: [{ text: userText }] });
 
-                pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js`;
-
-                let pdfDoc = null,
-                    pageNum = 1,
-                    pageRendering = false,
-                    pageNumPending = null;
-
-                const viewer = document.getElementById('pdf-viewer');
-                const pageNumEl = document.getElementById('page-num');
-                const pageCountEl = document.getElementById('page-count');
-
-                function renderPage(num) {
-                    pageRendering = true;
-                    pdfDoc.getPage(num).then(function(page) {
-                        const viewport = page.getViewport({ scale: 1.5 });
-                        
-                        const pageContainer = document.createElement('div');
-                        pageContainer.className = 'pdf-page-container';
-                        pageContainer.style.width = viewport.width + 'px';
-                        pageContainer.style.height = viewport.height + 'px';
-
-                        const canvas = document.createElement('canvas');
-                        canvas.height = viewport.height;
-                        canvas.width = viewport.width;
-
-                        const textLayerDiv = document.createElement('div');
-                        textLayerDiv.className = 'textLayer';
-
-                        pageContainer.appendChild(canvas);
-                        pageContainer.appendChild(textLayerDiv);
-                        if(viewer) {
-                            viewer.innerHTML = '';
-                            viewer.appendChild(pageContainer);
-                        }
-                        
-                        const context = canvas.getContext('2d');
-                        const renderContext = { canvasContext: context, viewport: viewport };
-                        
-                        const renderTask = page.render(renderContext);
-
-                        renderTask.promise.then(() => {
-                             return page.getTextContent();
-                        }).then((textContent) => {
-                            pdfjsLib.renderTextLayer({
-                                textContent: textContent,
-                                container: textLayerDiv,
-                                viewport: viewport,
-                                textDivs: []
-                            });
-
-                            pageRendering = false;
-                            if (pageNumPending !== null) {
-                                renderPage(pageNumPending);
-                                pageNumPending = null;
-                            }
-                        });
+                const loadingMessage = addMessageToChat('Аналізую ваш запит...', 'ai');
+                
+                try {
+                    const payload = {
+                        history: [systemInstruction, ...chatHistory]
+                    };
+                    
+                    const response = await fetch(vercelProxyUrl, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload)
                     });
                     
-                    if (pageNumEl) pageNumEl.textContent = num;
-                    if (bookmarkBtn) {
-                        if(bookmarkedPages.includes(num)) {
-                           bookmarkBtn.classList.add('active');
-                        } else {
-                           bookmarkBtn.classList.remove('active');
+                    if (!response.ok) throw new Error(`HTTP помилка! Статус: ${response.status}`);
+                    
+                    const jsonResponse = await response.json();
+                    loadingMessage.remove();
+                    
+                    let aiResponseTextForHistory = "";
+                    
+                    if (jsonResponse.recommendations && Array.isArray(jsonResponse.recommendations)) {
+                        let introductoryMessage = "Гаразд, я переглянув наші архіви і думаю, що вам може сподобатися ось це:";
+                        if (jsonResponse.recommendations.length > 1) {
+                           introductoryMessage = "Я знайшов кілька варіантів, які можуть вас зацікавити:";
                         }
-                    }
-                }
+                        addMessageToChat(introductoryMessage, 'ai');
+                        aiResponseTextForHistory += introductoryMessage;
 
-                function queueRenderPage(num) {
-                    if (pageRendering) {
-                        pageNumPending = num;
+                        let responseHtml = '';
+                        jsonResponse.recommendations.forEach(rec => {
+                            const book = bookDatabase.find(b => b.id === rec.id);
+                            if (book) {
+                                responseHtml += createBookCardForChat(book, rec.recommendation_text);
+                                aiResponseTextForHistory += `\nРекомендую '${book.title}': ${rec.recommendation_text}`;
+                            }
+                        });
+                        if (responseHtml) {
+                            addMessageToChat(responseHtml, 'ai', true);
+                        }
+                    } else if (jsonResponse.conversation) {
+                        addMessageToChat(jsonResponse.conversation, 'ai');
+                        aiResponseTextForHistory = jsonResponse.conversation;
                     } else {
-                        renderPage(num);
+                        throw new Error("Невідома структура відповіді від AI.");
                     }
-                }
-
-                document.getElementById('prev-page')?.addEventListener('click', () => {
-                    if (pageNum <= 1) return;
-                    pageNum--;
-                    queueRenderPage(pageNum);
-                });
-
-                document.getElementById('next-page')?.addEventListener('click', () => {
-                    if (pageNum >= pdfDoc.numPages) return;
-                    pageNum++;
-                    queueRenderPage(pageNum);
-                });
-                
-                if (bookmarkBtn) {
-                    bookmarkBtn.addEventListener('click', () => {
-                        const index = bookmarkedPages.indexOf(pageNum);
-                        if (index > -1) {
-                            bookmarkedPages.splice(index, 1);
-                            showToast(`Закладку на сторінці ${pageNum} видалено`);
-                        } else {
-                            bookmarkedPages.push(pageNum);
-                            showToast(`Закладку на сторінці ${pageNum} додано`);
-                        }
-                        sessionStorage.setItem(`bookmarks_${bookId}`, JSON.stringify(bookmarkedPages));
-                        bookmarkBtn.classList.toggle('active', bookmarkedPages.includes(pageNum));
+                    
+                    chatHistory.push({
+                        role: 'model',
+                        parts: [{ text: aiResponseTextForHistory }]
                     });
+
+                } catch (error) {
+                    loadingMessage.remove();
+                    addMessageToChat(`Вибачте, сталася помилка. Спробуйте, будь ласка, пізніше. (${error.message})`, 'ai');
+                    console.error('Error fetching from Gemini proxy:', error);
+                    chatHistory.pop();
                 }
 
-                pdfjsLib.getDocument(book.filePathPDF).promise.then(function(pdfDoc_) {
-                    pdfDoc = pdfDoc_;
-                    if (pageCountEl) pageCountEl.textContent = pdfDoc.numPages;
-                    if (loader) loader.style.display = 'none';
-                    renderPage(pageNum);
-                }).catch(function(error) {
-                    console.error('Error loading PDF:', error);
-                    if (loader) loader.textContent = 'Помилка завантаження PDF-файлу.';
-                });
+                sendMessageBtn.disabled = false;
+                chatInput.focus();
+            };
 
-            } else {
-                if (loader) loader.textContent = 'Помилка: файл книги не знайдено.';
+            sendMessageBtn.addEventListener('click', handleSendMessage);
+            chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleSendMessage());
+
+            const initialQuery = localStorage.getItem('neuroQuery');
+            if (initialQuery) {
+                chatInput.value = initialQuery;
+                localStorage.removeItem('neuroQuery');
+                handleSendMessage();
             }
         }
     }
