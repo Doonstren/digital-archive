@@ -90,19 +90,19 @@
         "filePathPDF": "books/atomic-habits.pdf"
     },
     {
-        "id": "design-patterns",
-        "title": "Патерни Проєктування",
-        "author": "Еріх Гамма, Річард Хелм, Ральф Джонсон, Джон Вліссідес",
-        "year": 2022,
+        "id": "clean-architecture",
+        "title": "Чиста архітектура",
+        "author": "Роберт Мартін",
+        "year": 2019,
         "categories": ["it", "programming"],
-        "coverUrl": "https://bookchef.ua/upload/iblock/04c/04c17f64f3b7f71f2fb560569209ed27.png",
+        "coverUrl": "https://bookchef.ua/upload/resize_cache/iblock/5db/390_390_1/5db629f643028c719a05f4560dbaf6ac.jpg",
         "publisher": "Фабула",
-        "pages": 448,
+        "pages": 432,
         "language": "Українська",
-        "rating": 4.5,
-        "votes": 150,
-        "annotation": "Фундаментальна праця, що описує 23 класичні патерни проєктування, які допомагають розробникам вирішувати поширені проблеми в дизайні програмного забезпечення.",
-        "filePathPDF": "books/design-patterns.pdf"
+        "rating": 4.8,
+        "votes": 255,
+        "annotation": "Роберт Мартін розкриває універсальні правила програмної архітектури, що допоможуть створювати гнучкі, надійні та легкі в підтримці системи. Книга вчить, як проєктувати ПЗ, що витримає перевірку часом.",
+        "filePathPDF": "books/clean-architecture.pdf"
     },
     {
         "id": "gates-of-europe",
@@ -180,19 +180,19 @@
         "filePathPDF": "books/metro-2033.pdf"
     },
     {
-        "id": "elon-musk",
-        "title": "Ілон Маск: Шлях у фантастичне майбутнє",
-        "author": "Ешлі Венс",
-        "year": 2017,
-        "categories": ["biography", "science"],
-        "coverUrl": "https://static.yakaboo.ua/media/catalog/product/m/u/muskfornewsletter.png",
-        "publisher": "Yakaboo Publishing",
-        "pages": 424,
+        "id": "steve-jobs",
+        "title": "Стів Джобс",
+        "author": "Волтер Айзексон",
+        "year": 2015,
+        "categories": ["biography", "it"],
+        "coverUrl": "https://static.yakaboo.ua/media/catalog/product/c/o/cover_86_103.jpg",
+        "publisher": "Наш Формат",
+        "pages": 608,
         "language": "Українська",
-        "rating": 4.6,
-        "votes": 250,
-        "annotation": "Біографія одного з найвидатніших інноваторів сучасності, яка розкриває його шлях від дитинства в Південній Африці до створення компаній, що змінюють світ.",
-        "filePathPDF": "books/elon-musk.pdf"
+        "rating": 4.8,
+        "votes": 350,
+        "annotation": "Ексклюзивна біографія, заснована на більш ніж сорока інтерв'ю з Джобсом, а також понад ста інтерв'ю з його родичами, друзями, ворогами, конкурентами та колегами. Це історія життя, сповненого злетів та падінь.",
+        "filePathPDF": "books/steve-jobs.pdf"
     },
     {
         "id": "the-martian",
