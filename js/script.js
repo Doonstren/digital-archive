@@ -517,8 +517,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 try {
                     const payload = {
-                        // Для Gemini правильный формат - просто массив чередующихся ролей
-                        history: [systemInstruction, ...chatHistory] 
+                        history: [systemInstruction, ...chatHistory]
                     };
                     
                     const response = await fetch(vercelProxyUrl, {
