@@ -102,6 +102,10 @@ img {
     background: var(--accent-color-light);
     border-color: var(--accent-color-light);
 }
+.btn-neuro-header-small {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+}
 .btn-secondary {
     background-color: var(--text-muted-color);
     border-color: var(--text-muted-color);
@@ -230,6 +234,47 @@ main {
     border-color: var(--accent-color-light);
 }
 
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.carousel-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+.carousel-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-color);
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--text-color);
+    transition: all 0.2s ease;
+}
+.carousel-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+.carousel-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.carousel-container {
+    overflow: hidden;
+    padding: 0.5rem 0;
+}
+.carousel-track {
+    display: flex;
+    gap: 1.5rem;
+    transition: transform 0.5s ease-in-out;
+}
+.carousel-track .book-card {
+    flex: 0 0 220px;
+}
 .book-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
