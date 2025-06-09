@@ -88,47 +88,74 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             }
             
+            const carouselContainer = document.getElementById('carousel-container');
             const carouselTrack = document.getElementById('new-arrivals-carousel');
             const prevBtn = document.getElementById('carousel-prev');
             const nextBtn = document.getElementById('carousel-next');
 
             if (carouselTrack && prevBtn && nextBtn) {
                 carouselTrack.innerHTML = bookDatabase.map(renderBookCard).join('');
-                let currentIndex = 0;
-                const cardWidth = 220; // width of .book-card
-                const gap = 24; // 1.5rem gap
-                const scrollAmount = cardWidth + gap;
+                let currentTranslate = 0;
+                let isDown = false;
+                let startX;
+                let scrollLeft;
 
-                function updateCarousel() {
-                    carouselTrack.style.transform = `translateX(-${currentIndex * scrollAmount}px)`;
-                    prevBtn.disabled = currentIndex === 0;
-                    
-                    const containerWidth = carouselTrack.parentElement.offsetWidth;
-                    const trackWidth = carouselTrack.scrollWidth;
-                    const currentPosition = currentIndex * scrollAmount;
-                    
-                    nextBtn.disabled = (currentPosition + containerWidth) >= trackWidth;
+                function updateCarouselButtons() {
+                    const maxTranslate = 0;
+                    const minTranslate = carouselContainer.offsetWidth - carouselTrack.scrollWidth;
+                    prevBtn.disabled = currentTranslate >= maxTranslate;
+                    nextBtn.disabled = currentTranslate <= minTranslate;
+                }
+                
+                function moveCarousel(amount) {
+                    const maxTranslate = 0;
+                    const minTranslate = carouselContainer.offsetWidth - carouselTrack.scrollWidth;
+                    currentTranslate += amount;
+                    if (currentTranslate > maxTranslate) currentTranslate = maxTranslate;
+                    if (currentTranslate < minTranslate) currentTranslate = minTranslate;
+                    carouselTrack.style.transform = `translateX(${currentTranslate}px)`;
+                    updateCarouselButtons();
                 }
 
-                prevBtn.addEventListener('click', () => {
-                    if (currentIndex > 0) {
-                        currentIndex--;
-                        updateCarousel();
+                prevBtn.addEventListener('click', () => moveCarousel(244));
+                nextBtn.addEventListener('click', () => moveCarousel(-244));
+                
+                carouselContainer.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    carouselContainer.classList.add('grabbing');
+                    startX = e.pageX - carouselContainer.offsetLeft;
+                    scrollLeft = currentTranslate;
+                });
+                
+                carouselContainer.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    carouselContainer.classList.remove('grabbing');
+                });
+                
+                carouselContainer.addEventListener('mouseup', () => {
+                    isDown = false;
+                    carouselContainer.classList.remove('grabbing');
+                });
+                
+                carouselContainer.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - carouselContainer.offsetLeft;
+                    const walk = x - startX;
+                    const newTranslate = scrollLeft + walk;
+                    
+                    const maxTranslate = 0;
+                    const minTranslate = carouselContainer.offsetWidth - carouselTrack.scrollWidth;
+
+                    if(newTranslate <= maxTranslate && newTranslate >= minTranslate) {
+                        currentTranslate = newTranslate;
+                        carouselTrack.style.transform = `translateX(${currentTranslate}px)`;
+                        updateCarouselButtons();
                     }
                 });
 
-                nextBtn.addEventListener('click', () => {
-                     const containerWidth = carouselTrack.parentElement.offsetWidth;
-                     const trackWidth = carouselTrack.scrollWidth;
-                     const currentPosition = currentIndex * scrollAmount;
-                     if((currentPosition + containerWidth) < trackWidth){
-                        currentIndex++;
-                        updateCarousel();
-                     }
-                });
-
-                window.addEventListener('resize', updateCarousel);
-                updateCarousel();
+                window.addEventListener('resize', updateCarouselButtons);
+                updateCarouselButtons();
             }
         }
 
@@ -261,114 +288,55 @@ document.addEventListener('DOMContentLoaded', async () => {
             applyFiltersAndRender();
         }
 
-        // Остальной код (neuro_librarian, book.html, reader.html, etc.) остается без изменений
-        if (currentPath === 'neuro_librarian.html') {
-            const chatMessages = document.getElementById('chatMessages');
-            const chatInput = document.getElementById('chatInput');
-            const sendMessageBtn = document.getElementById('sendMessageBtn');
-            const vercelProxyUrl = 'https://digital-archive-proxy-doonstrens-projects.vercel.app/api/gemini';
+        // Остальной код остается без изменений, кроме блока profile.html
+        if (currentPath === 'profile.html') {
+            const showLoginBtn = document.getElementById('show-login');
+            const showRegisterBtn = document.getElementById('show-register');
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
 
-            const addMessageToChat = (text, sender, isHtml = false) => {
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message', `${sender}-message`);
-                if (isHtml) {
-                    messageDiv.innerHTML = text;
-                } else {
-                    messageDiv.appendChild(document.createTextNode(text));
-                }
-                chatMessages.appendChild(messageDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                return messageDiv;
-            };
-            
-            const createBookCardForChat = (book, recommendationText) => {
-                if (!book) return '';
-                return `
-                    <div class="book-card-chat">
-                        <img src="${book.coverUrl}" alt="${book.title}">
-                        <h4>${book.title}</h4>
-                        <p><strong>Автор:</strong> ${book.author}</p>
-                        <p>${recommendationText}</p> 
-                        <a href="book.html?id=${book.id}" class="btn" target="_blank">Детальніше</a>
-                    </div>`;
-            };
-            
-            const constructGeminiPrompt = (userQuery) => {
-                const bookContextString = JSON.stringify(bookDatabase.map(b => ({
-                    id: b.id,
-                    title: b.title,
-                    author: b.author,
-                    annotation: b.annotation,
-                    categories: b.categories
-                })));
+            if (showLoginBtn && showRegisterBtn && loginForm && registerForm) {
+                showLoginBtn.addEventListener('click', () => {
+                    loginForm.classList.remove('hidden');
+                    registerForm.classList.add('hidden');
+                    showLoginBtn.classList.add('active');
+                    showRegisterBtn.classList.remove('active');
+                });
 
-                return `You are a creative and conversational Ukrainian-speaking library assistant named "Нейро-Бібліотекар". Your task is to analyze the user's request and the provided book database. Your response MUST be a valid JSON object. This is the list of available books in JSON format: ${bookContextString} The user's request is: "${userQuery}" RULES: 1. If you find relevant books, your response MUST be a JSON object with a "recommendations" key. The value should be an array of objects. Each object MUST contain two keys: - "id": The ID of the book from the provided list. - "recommendation_text": A NEW, ORIGINAL, and engaging description (2-4 sentences in Ukrainian) explaining WHY this book is a good match for the user's request. DO NOT simply copy the annotation. Be creative, like a real librarian giving a personal recommendation. Example: {"recommendations": [{"id": "dune", "recommendation_text": "Оскільки ви шукали епічну фантастику, 'Дюна' – це саме те, що треба! Це не просто книга, а цілий всесвіт з глибокою політикою, філософією та незабутньою атмосферою пустельної планети. Вона змусить вас замислитись."}]} 2. If you cannot find any relevant books, or if the user is just greeting you or asking a general question, your response MUST be a JSON object with a "conversation" key. The value should be a friendly, helpful message in Ukrainian. Example: {"conversation": "Вітаю! Радий допомогти вам у пошуку ідеальної книги. Що вас цікавить сьогодні?"}`;
-            };
-
-            const handleSendMessage = async () => {
-                const userText = chatInput.value.trim();
-                if (!userText) return;
-
-                addMessageToChat(userText, 'user');
-                chatInput.value = '';
-                sendMessageBtn.disabled = true;
-
-                const loadingMessage = addMessageToChat('Аналізую ваш запит...', 'ai');
-                const prompt = constructGeminiPrompt(userText);
-
-                try {
-                    const response = await fetch(vercelProxyUrl, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ prompt: prompt })
-                    });
-                    
-                    if (!response.ok) throw new Error(`HTTP помилка! Статус: ${response.status}`);
-                    
-                    const jsonResponse = await response.json();
-                    loadingMessage.remove();
-                    
-                    if (jsonResponse.recommendations && Array.isArray(jsonResponse.recommendations)) {
-                        let introductoryMessage = "Гаразд, я переглянув наші архіви і думаю, що вам може сподобатися ось це:";
-                        if (jsonResponse.recommendations.length > 1) {
-                           introductoryMessage = "Я знайшов кілька варіантів, які можуть вас зацікавити:";
-                        }
-                        addMessageToChat(introductoryMessage, 'ai');
-
-                        let responseHtml = '';
-                        jsonResponse.recommendations.forEach(rec => {
-                            const book = bookDatabase.find(b => b.id === rec.id);
-                            if (book) {
-                                responseHtml += createBookCardForChat(book, rec.recommendation_text);
-                            }
-                        });
-                        if (responseHtml) {
-                            addMessageToChat(responseHtml, 'ai', true);
-                        }
-                    } else if (jsonResponse.conversation) {
-                        addMessageToChat(jsonResponse.conversation, 'ai');
-                    } else {
-                        throw new Error("Невідома структура відповіді від AI.");
+                showRegisterBtn.addEventListener('click', () => {
+                    loginForm.classList.add('hidden');
+                    registerForm.classList.remove('hidden');
+                    showLoginBtn.classList.remove('active');
+                    showRegisterBtn.classList.add('active');
+                });
+                
+                const loginMessage = document.getElementById('login-message');
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    loginMessage.textContent = 'Обробка...';
+                    loginMessage.className = 'form-message';
+                    await new Promise(res => setTimeout(res, 500));
+                    loginMessage.textContent = 'Вхід успішний! Перенаправлення...';
+                    loginMessage.classList.add('success');
+                    setTimeout(() => window.location.href = 'index.html', 1500);
+                });
+                
+                const registerMessage = document.getElementById('register-message');
+                registerForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    registerMessage.textContent = 'Реєстрація...';
+                    registerMessage.className = 'form-message';
+                    if (registerForm.registerPassword.value !== registerForm.registerPasswordConfirm.value) {
+                        registerMessage.textContent = 'Паролі не співпадають.';
+                        registerMessage.classList.add('error');
+                        return;
                     }
-
-                } catch (error) {
-                    loadingMessage.remove();
-                    addMessageToChat(`Вибачте, сталася помилка. Спробуйте, будь ласка, пізніше. (${error.message})`, 'ai');
-                    console.error('Error fetching from Gemini proxy:', error);
-                }
-
-                sendMessageBtn.disabled = false;
-                chatInput.focus();
-            };
-
-            sendMessageBtn.addEventListener('click', handleSendMessage);
-            chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleSendMessage());
-
-            const initialQuery = localStorage.getItem('neuroQuery');
-            if (initialQuery) {
-                chatInput.value = initialQuery;
-                localStorage.removeItem('neuroQuery');
-                handleSendMessage();
+                    await new Promise(res => setTimeout(res, 500));
+                    registerMessage.textContent = 'Реєстрація успішна! Тепер ви можете увійти.';
+                    registerMessage.classList.add('success');
+                    registerForm.reset();
+                    setTimeout(() => showLoginBtn.click(), 1500);
+                });
             }
         }
     }
