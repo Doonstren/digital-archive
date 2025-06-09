@@ -157,7 +157,7 @@ html.dark-theme .btn-secondary:hover {
 }
 .site-header .container {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: max-content 1fr auto;
     align-items: center;
     height: 100%;
     gap: 1.5rem;
@@ -166,10 +166,9 @@ html.dark-theme .btn-secondary:hover {
 .logo-container {
     grid-column: 1 / 2;
     justify-self: start;
-    height: 45px;
 }
 .logo-light, .logo-dark {
-    height: 100%;
+    height: 45px;
     width: auto;
     max-height: calc(var(--header-height) - 20px);
 }
