@@ -323,5 +323,57 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             applyFiltersAndRender();
         }
+
+        if (currentPath === 'profile.html') {
+            const showLoginBtn = document.getElementById('show-login');
+            const showRegisterBtn = document.getElementById('show-register');
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+
+            if (showLoginBtn && showRegisterBtn && loginForm && registerForm) {
+                showLoginBtn.addEventListener('click', () => {
+                    loginForm.classList.remove('hidden');
+                    registerForm.classList.add('hidden');
+                    showLoginBtn.classList.add('active');
+                    showRegisterBtn.classList.remove('active');
+                });
+
+                showRegisterBtn.addEventListener('click', () => {
+                    loginForm.classList.add('hidden');
+                    registerForm.classList.remove('hidden');
+                    showLoginBtn.classList.remove('active');
+                    showRegisterBtn.classList.add('active');
+                });
+                
+                const loginMessage = document.getElementById('login-message');
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    loginMessage.textContent = 'Обробка...';
+                    loginMessage.className = 'form-message';
+                    await new Promise(res => setTimeout(res, 500));
+                    loginMessage.textContent = 'Вхід успішний! Перенаправлення...';
+                    loginMessage.classList.add('success');
+                    setTimeout(() => window.location.href = 'index.html', 1500);
+                });
+                
+                const registerMessage = document.getElementById('register-message');
+                registerForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    registerMessage.textContent = 'Реєстрація...';
+                    registerMessage.className = 'form-message';
+                    if (registerForm.registerPassword.value !== registerForm.registerPasswordConfirm.value) {
+                        registerMessage.textContent = 'Паролі не співпадають.';
+                        registerMessage.classList.add('error');
+                        return;
+                    }
+                    await new Promise(res => setTimeout(res, 500));
+                    registerMessage.textContent = 'Реєстрація успішна! Тепер ви можете увійти.';
+                    registerMessage.classList.add('success');
+                    registerForm.reset();
+                    setTimeout(() => showLoginBtn.click(), 1500);
+                });
+            }
+        }
+        
     }
 });

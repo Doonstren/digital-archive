@@ -492,6 +492,10 @@ main {
     padding: 1rem;
     border-top: 1px solid var(--border-color);
 }
+.accordion-content ul {
+    padding-left: 1.5rem;
+    list-style-position: outside;
+}
 
 .contact-layout-container {
     display: flex;
@@ -542,6 +546,7 @@ main {
     .catalog-page-container { flex-direction: column; }
     .filters { flex: 0 0 auto; width: 100%; margin-bottom: 1.5rem; }
     .book-details-container { flex-direction: column; }
+    .contact-layout-container { flex-direction: column; }
     
     .chat-container { height: calc(100vh - var(--header-height) - 2rem); }
     
