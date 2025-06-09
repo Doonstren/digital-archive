@@ -36,6 +36,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function initializeApp() {
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const currentTheme = localStorage.getItem('theme');
+
+        const updateThemeIcon = () => {
+            if (document.body.classList.contains('dark-theme')) {
+                themeToggleBtn.textContent = '☀️';
+            } else {
+                themeToggleBtn.textContent = '🌙';
+            }
+        };
+
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+        if (themeToggleBtn) {
+            updateThemeIcon();
+            themeToggleBtn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-theme');
+                let theme = 'light';
+                if (document.body.classList.contains('dark-theme')) {
+                    theme = 'dark';
+                }
+                localStorage.setItem('theme', theme);
+                updateThemeIcon();
+            });
+        }
+        
         const currentPath = window.location.pathname.split('/').pop() || 'index.html';
 
         const menuToggle = document.querySelector('.mobile-menu-toggle');
@@ -600,6 +627,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if(titleHeader) titleHeader.textContent = book.title;
                 
                 let bookmarkedPages = JSON.parse(sessionStorage.getItem(`bookmarks_${bookId}`) || '[]');
+                
+                const storageKey = `lastPage_${book.id}`;
 
                 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js`;
 
@@ -680,12 +709,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('prev-page')?.addEventListener('click', () => {
                     if (pageNum <= 1) return;
                     pageNum--;
+                    localStorage.setItem(storageKey, pageNum);
                     queueRenderPage(pageNum);
                 });
 
                 document.getElementById('next-page')?.addEventListener('click', () => {
                     if (pageNum >= pdfDoc.numPages) return;
                     pageNum++;
+                    localStorage.setItem(storageKey, pageNum);
                     queueRenderPage(pageNum);
                 });
                 
@@ -707,6 +738,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 pdfjsLib.getDocument(book.filePathPDF).promise.then(function(pdfDoc_) {
                     pdfDoc = pdfDoc_;
                     if (pageCountEl) pageCountEl.textContent = pdfDoc.numPages;
+                    
+                    const savedPage = parseInt(localStorage.getItem(storageKey), 10);
+                    if (savedPage && savedPage > 0 && savedPage <= pdfDoc.numPages) {
+                        pageNum = savedPage;
+                        showToast(`Відкрито на збереженій сторінці ${pageNum}`);
+                    }
+                    
                     if (loader) loader.style.display = 'none';
                     renderPage(pageNum);
                 }).catch(function(error) {
