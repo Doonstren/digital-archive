@@ -196,9 +196,6 @@ main {
     padding-top: 1.5rem;
     padding-bottom: 2rem;
 }
-main section {
-    margin-bottom: 2rem;
-}
 
 .hero-section {
     background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
@@ -278,9 +275,11 @@ main section {
     display: flex;
     gap: 1.5rem;
     transition: transform 0.5s ease-out;
+    pointer-events: none;
 }
 .carousel-track .book-card {
     flex: 0 0 220px;
+    pointer-events: auto;
 }
 
 .book-grid {
@@ -493,10 +492,22 @@ main section {
     padding: 1rem;
     border-top: 1px solid var(--border-color);
 }
-.accordion-content ul {
+.accordion-content ul.goals-list {
     padding-left: 1.5rem;
-    list-style-position: outside;
+    list-style: none;
 }
+.goals-list li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+.goals-list li::before {
+    content: '✔';
+    color: var(--success-color);
+    position: absolute;
+    left: 0;
+}
+
 .partner-block {
     display: flex;
     align-items: center;
@@ -509,21 +520,6 @@ main section {
 }
 .partner-info p {
     margin: 0;
-}
-.goals-list li::before {
-    content: '✔';
-    color: var(--success-color);
-    position: absolute;
-    left: 0;
-}
-.goals-list {
-    list-style: none;
-    padding-left: 0;
-}
-.goals-list li {
-    position: relative;
-    padding-left: 1.5rem;
-    margin-bottom: 0.5rem;
 }
 
 .contact-layout-container {
@@ -545,17 +541,17 @@ main section {
 .info-section p {
     margin-bottom: 0.5rem;
 }
-.map-placeholder {
-    height: 200px;
-    background-color: var(--bg-alt-color);
-    border: 1px solid var(--border-color);
+.map-container {
+    height: 250px;
     border-radius: var(--default-radius);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: var(--text-muted-color);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
     margin-top: 1rem;
+}
+.map-container iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
 }
 
 .hidden { display: none !important; }
@@ -578,25 +574,17 @@ main section {
 .footer-content {
     text-align: left;
 }
-.footer-nav a {
-    color: var(--text-muted-color);
-    margin: 0 0.25rem;
-}
-.footer-nav a:hover {
-    color: var(--primary-color);
-}
 .footer-content p {
-    margin: 0 0 0.25rem 0;
+    margin: 0;
 }
 .footer-partner {
     display: flex;
     align-items: center;
     gap: 0.75rem;
 }
-.footer-partner-label {
-    font-weight: 500;
+.footer-partner span {
+    font-weight: 400;
     color: var(--text-muted-color);
-    font-size: 0.85rem;
 }
 .footer-partner a {
     display: inline-block;
