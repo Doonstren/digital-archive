@@ -8,10 +8,19 @@
   <link rel="icon" type="image/x-icon" href="img/favicon.ico">
 </head>
 <body>
+<script>
+  (function() {
+    const theme = localStorage.getItem('theme');
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark-theme');
+    }
+  })();
+</script>
 <header class="site-header">
   <div class="container">
-    <a href="index.html" class="logo"><img src="img/logo.png" alt='Логотип "Цифровий Архів"'></a>
-    <button class="mobile-menu-toggle">☰</button>
+    <div class="logo-container">
+        <a href="index.html" class="logo"><img src="img/logo.png" alt='Логотип "Цифровий Архів"'></a>
+    </div>
     <nav class="main-nav">
       <ul>
         <li><a href="index.html">Головна</a></li>
@@ -21,8 +30,8 @@
         <li><a href="contact.html">Контакти</a></li>
       </ul>
     </nav>
+    <button class="mobile-menu-toggle">☰</button>
     <div class="header-actions">
-      <button id="theme-toggle-btn" class="theme-toggle-btn" title="Змінити тему">🌙</button>
       <a href="neuro_librarian.html" class="btn btn-neuro-header btn-neuro-header-small">Нейро-Бібліотекар</a>
       <form class="search-form" action="search.html" method="get">
         <input type="search" name="q" placeholder="Пошук..." aria-label="Пошук книг">
@@ -31,6 +40,7 @@
       <div class="auth-links">
         <a href="profile.html">Вхід</a> / <a href="profile.html">Реєстрація</a>
       </div>
+      <button id="theme-toggle-btn" class="theme-toggle-btn" title="Змінити тему">🌙</button>
     </div>
   </div>
 </header>

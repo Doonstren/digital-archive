@@ -37,25 +37,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function initializeApp() {
         const themeToggleBtn = document.getElementById('theme-toggle-btn');
-        const currentTheme = localStorage.getItem('theme');
-
+        
         const updateThemeIcon = () => {
-            if (document.body.classList.contains('dark-theme')) {
-                themeToggleBtn.textContent = '☀️';
-            } else {
-                themeToggleBtn.textContent = '🌙';
+            if (themeToggleBtn) {
+                if (document.documentElement.classList.contains('dark-theme')) {
+                    themeToggleBtn.textContent = '☀️';
+                } else {
+                    themeToggleBtn.textContent = '🌙';
+                }
             }
         };
 
-        if (currentTheme === 'dark') {
-            document.body.classList.add('dark-theme');
-        }
         if (themeToggleBtn) {
-            updateThemeIcon();
+            updateThemeIcon(); // Set initial icon
             themeToggleBtn.addEventListener('click', () => {
-                document.body.classList.toggle('dark-theme');
+                document.documentElement.classList.toggle('dark-theme');
                 let theme = 'light';
-                if (document.body.classList.contains('dark-theme')) {
+                if (document.documentElement.classList.contains('dark-theme')) {
                     theme = 'dark';
                 }
                 localStorage.setItem('theme', theme);
