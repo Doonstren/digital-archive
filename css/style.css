@@ -166,9 +166,10 @@ html.dark-theme .btn-secondary:hover {
 .logo-container {
     grid-column: 1 / 2;
     justify-self: start;
+    height: 45px;
 }
 .logo-light, .logo-dark {
-    height: 45px;
+    height: 100%;
     width: auto;
     max-height: calc(var(--header-height) - 20px);
 }
