@@ -116,6 +116,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (carouselTrack && prevBtn && nextBtn) {
                 carouselTrack.innerHTML = bookDatabase.map(renderBookCard).join('');
+                
+                carouselTrack.querySelectorAll('img').forEach(img => {
+                    img.addEventListener('dragstart', (e) => e.preventDefault());
+                });
+
                 let currentTranslate = 0;
                 let isDown = false;
                 let startX;
