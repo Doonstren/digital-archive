@@ -248,7 +248,7 @@ html.dark-theme .logo-dark { filter: none; }
     justify-content: center;
     color: var(--text-color);
     transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
-    flex-shrink: 0; /* Important fix for the oval shape */
+    flex-shrink: 0; 
 }
 .theme-toggle-btn:hover {
     background-color: var(--bg-alt-color);
@@ -773,22 +773,18 @@ html.dark-theme .map-container iframe {
 }
 
 @media (max-width: 992px) {
-    .site-header .container {
-        grid-template-columns: 1fr auto;
-    }
     .main-nav {
         display: none;
     }
     .mobile-menu-toggle {
         display: block;
-        order: 1; /* Make it appear after actions */
+        grid-column: 3 / 4;
         justify-self: end;
     }
-    .header-actions {
-        order: 2;
-        gap: 0.5rem;
+    .site-header .container {
+        grid-template-columns: auto 1fr auto;
     }
-    .header-actions .btn-neuro-header-small, .header-actions .auth-links {
+    .header-actions {
         display: none;
     }
     .main-nav.active {
