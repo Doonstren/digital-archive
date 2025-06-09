@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const chatMessages = document.getElementById('chatMessages');
             const chatInput = document.getElementById('chatInput');
             const sendMessageBtn = document.getElementById('sendMessageBtn');
-            const vercelProxyUrl = 'https://digital-archive-proxy-doonstrens-projects.vercel.app/'; 
+            const vercelProxyUrl = 'https://digital-archive-proxy-doonstrens-projects.vercel.app/api/gemini'; 
 
             const addMessageToChat = (text, sender, isHtml = false) => {
                 const messageDiv = document.createElement('div');
