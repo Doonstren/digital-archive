@@ -169,6 +169,7 @@ html.dark-theme .btn-secondary:hover {
 }
 .logo-light, .logo-dark {
     height: 45px;
+    width: auto;
     max-height: calc(var(--header-height) - 20px);
 }
 .logo-dark { display: none; }
