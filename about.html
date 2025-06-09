@@ -6,31 +6,34 @@
     <title>Про нас - "Цифровий Архів"</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <script>
+      (function() {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+      })();
+    </script>
 </head>
 <body>
-<script>
-  (function() {
-    const theme = localStorage.getItem('theme');
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark-theme');
-    }
-  })();
-</script>
+
 <header class="site-header">
   <div class="container">
-    <div class="logo-container">
-        <a href="index.html" class="logo"><img src="img/logo.png" alt='Логотип "Цифровий Архів"'></a>
-    </div>
+    <a href="index.html" class="logo-container">
+      <img src="img/logo.png" alt='Логотип "Цифровий Архів"' class="logo-light">
+      <img src="img/logo-dark.png" alt='Логотип "Цифровий Архів" (темна тема)' class="logo-dark">
+    </a>
+    
     <nav class="main-nav">
       <ul>
         <li><a href="index.html">Головна</a></li>
-        <li><a href="catalog.html" class="active">Каталог</a></li>
-        <li><a href="about.html">Про нас</a></li>
+        <li><a href="catalog.html">Каталог</a></li>
+        <li><a href="about.html" class="active">Про нас</a></li>
         <li><a href="help.html">Допомога</a></li>
         <li><a href="contact.html">Контакти</a></li>
       </ul>
     </nav>
-    <button class="mobile-menu-toggle">☰</button>
+
     <div class="header-actions">
       <a href="neuro_librarian.html" class="btn btn-neuro-header btn-neuro-header-small">Нейро-Бібліотекар</a>
       <form class="search-form" action="search.html" method="get">
@@ -42,63 +45,65 @@
       </div>
       <button id="theme-toggle-btn" class="theme-toggle-btn" title="Змінити тему">🌙</button>
     </div>
+
+    <button class="mobile-menu-toggle">☰</button>
   </div>
 </header>
 
-    <main>
-        <div class="container">
-            <nav class="breadcrumbs" aria-label="breadcrumb">
-                <a href="index.html">Головна</a>
-                <span>»</span>
-                <span>Про нас</span>
-            </nav>
+<main>
+    <div class="container">
+        <nav class="breadcrumbs" aria-label="breadcrumb">
+            <a href="index.html">Головна</a>
+            <span>»</span>
+            <span>Про нас</span>
+        </nav>
 
-            <h1 class="page-title">Про Електронну Бібліотеку "Цифровий Архів"</h1>
-            
-            <div class="accordion-item open">
-                <h2 class="accordion-header">Наша місія</h2>
-                <div class="accordion-content">
-                    <p>Створити централізоване сховище електронних книг та документів, забезпечити зручний та швидкий доступ користувачів до необхідної літератури, сприяти поширенню знань та полегшенню освітнього та дослідницького процесів.</p>
-                    <p>Ми прагнемо стати надійним джерелом інформації та продемонструвати можливості сучасних цифрових технологій, включаючи інтелектуальні системи пошуку, для збереження та поширення культурної та наукової спадщини.</p>
-                </div>
+        <h1 class="page-title">Про Електронну Бібліотеку "Цифровий Архів"</h1>
+        
+        <div class="accordion-item open">
+            <h2 class="accordion-header">Наша місія</h2>
+            <div class="accordion-content">
+                <p>Створити централізоване сховище електронних книг та документів, забезпечити зручний та швидкий доступ користувачів до необхідної літератури, сприяти поширенню знань та полегшенню освітнього та дослідницького процесів.</p>
+                <p>Ми прагнемо стати надійним джерелом інформації та продемонструвати можливості сучасних цифрових технологій, включаючи інтелектуальні системи пошуку, для збереження та поширення культурної та наукової спадщини.</p>
             </div>
-
-            <div class="accordion-item">
-                 <h2 class="accordion-header">Наші цілі</h2>
-                 <div class="accordion-content">
-                    <ul class="goals-list">
-                        <li>Надання доступу до широкого спектру літератури.</li>
-                        <li>Зручний пошук та навігація по каталогу, включаючи інтелектуальний пошук.</li>
-                        <li>Можливість читання онлайн та завантаження книг у різних форматах.</li>
-                        <li>Підтримка та інтеграція сучасних технологій для покращення користувацького досвіду.</li>
-                        <li>Постійне оновлення та розширення фондів.</li>
-                    </ul>
-                 </div>
-            </div>
-
-            <div class="accordion-item">
-                 <h2 class="accordion-header">Творці проекту</h2>
-                 <div class="accordion-content">
-                    <p>Проект "Цифровий Архів" розроблено компанією <strong>ТОВ "ТехноКнига"</strong> на замовлення <strong>ТОВ "Освітній Простір"</strong>, з метою демонстрації можливостей сучасної електронної бібліотеки з інтегрованим ШІ-асистентом.</p>
-                 </div>
-            </div>
-
-            <div class="accordion-item">
-                 <h2 class="accordion-header">Партнери</h2>
-                 <div class="accordion-content">
-                    <div class="partner-block">
-                        <a href="https://argentum200.github.io/ai_hub/index.html" target="_blank" rel="noopener noreferrer">
-                            <img src="img/ai-hub.png" alt="Логотип AI Hub" class="partner-logo">
-                        </a>
-                        <div class="partner-info">
-                             <p>Наш інформаційний партнер – <a href="https://argentum200.github.io/ai_hub/index.html" target="_blank" rel="noopener noreferrer"><strong>AI Hub</strong></a>. Це провідний ресурс, присвячений новинам, розробкам та обговоренням у сфері штучного інтелекту.</p>
-                        </div>
-                    </div>
-                 </div>
-            </div>
-
         </div>
-    </main>
+
+        <div class="accordion-item">
+             <h2 class="accordion-header">Наші цілі</h2>
+             <div class="accordion-content">
+                <ul class="goals-list">
+                    <li>Надання доступу до широкого спектру літератури.</li>
+                    <li>Зручний пошук та навігація по каталогу, включаючи інтелектуальний пошук.</li>
+                    <li>Можливість читання онлайн та завантаження книг у різних форматах.</li>
+                    <li>Підтримка та інтеграція сучасних технологій для покращення користувацького досвіду.</li>
+                    <li>Постійне оновлення та розширення фондів.</li>
+                </ul>
+             </div>
+        </div>
+
+        <div class="accordion-item">
+             <h2 class="accordion-header">Творці проекту</h2>
+             <div class="accordion-content">
+                <p>Проект "Цифровий Архів" розроблено компанією <strong>ТОВ "ТехноКнига"</strong> на замовлення <strong>ТОВ "Освітній Простір"</strong>, з метою демонстрації можливостей сучасної електронної бібліотеки з інтегрованим ШІ-асистентом.</p>
+             </div>
+        </div>
+
+        <div class="accordion-item">
+             <h2 class="accordion-header">Партнери</h2>
+             <div class="accordion-content">
+                <div class="partner-block">
+                    <a href="https://argentum200.github.io/ai_hub/index.html" target="_blank" rel="noopener noreferrer">
+                        <img src="img/ai-hub.png" alt="Логотип AI Hub" class="partner-logo">
+                    </a>
+                    <div class="partner-info">
+                         <p>Наш інформаційний партнер – <a href="https://argentum200.github.io/ai_hub/index.html" target="_blank" rel="noopener noreferrer"><strong>AI Hub</strong></a>. Це провідний ресурс, присвячений новинам, розробкам та обговоренням у сфері штучного інтелекту.</p>
+                    </div>
+                </div>
+             </div>
+        </div>
+
+    </div>
+</main>
 
 <footer class="site-footer">
    <div class="container">
@@ -119,6 +124,6 @@
     </div>
 </footer>
 
-    <script src="js/script.js"></script>
+<script src="js/script.js"></script>
 </body>
 </html>
