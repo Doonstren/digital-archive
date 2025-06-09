@@ -517,7 +517,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 try {
                     const payload = {
-                        history: [systemInstruction, ...chatHistory]
+                        // Для Gemini правильный формат - просто массив чередующихся ролей
+                        history: [systemInstruction, ...chatHistory] 
                     };
                     
                     const response = await fetch(vercelProxyUrl, {
@@ -583,6 +584,139 @@ document.addEventListener('DOMContentLoaded', async () => {
                 chatInput.value = initialQuery;
                 localStorage.removeItem('neuroQuery');
                 handleSendMessage();
+            }
+        }
+        
+        if (currentPath === 'reader.html') {
+            const params = new URLSearchParams(window.location.search);
+            const bookId = params.get('id');
+            const book = bookDatabase.find(b => b.id === bookId);
+
+            const titleHeader = document.getElementById('book-title-header');
+            const loader = document.getElementById('loader');
+            const bookmarkBtn = document.getElementById('bookmark-btn');
+            
+            if (book && book.filePathPDF) {
+                document.title = `${book.title} – Читалка`;
+                if(titleHeader) titleHeader.textContent = book.title;
+                
+                let bookmarkedPages = JSON.parse(sessionStorage.getItem(`bookmarks_${bookId}`) || '[]');
+
+                pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js`;
+
+                let pdfDoc = null,
+                    pageNum = 1,
+                    pageRendering = false,
+                    pageNumPending = null;
+
+                const viewer = document.getElementById('pdf-viewer');
+                const pageNumEl = document.getElementById('page-num');
+                const pageCountEl = document.getElementById('page-count');
+
+                function renderPage(num) {
+                    pageRendering = true;
+                    pdfDoc.getPage(num).then(function(page) {
+                        const viewport = page.getViewport({ scale: 1.5 });
+                        
+                        const pageContainer = document.createElement('div');
+                        pageContainer.className = 'pdf-page-container';
+                        pageContainer.style.width = viewport.width + 'px';
+                        pageContainer.style.height = viewport.height + 'px';
+
+                        const canvas = document.createElement('canvas');
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+
+                        const textLayerDiv = document.createElement('div');
+                        textLayerDiv.className = 'textLayer';
+
+                        pageContainer.appendChild(canvas);
+                        pageContainer.appendChild(textLayerDiv);
+                        if(viewer) {
+                            viewer.innerHTML = '';
+                            viewer.appendChild(pageContainer);
+                        }
+                        
+                        const context = canvas.getContext('2d');
+                        const renderContext = { canvasContext: context, viewport: viewport };
+                        
+                        const renderTask = page.render(renderContext);
+
+                        renderTask.promise.then(() => {
+                             return page.getTextContent();
+                        }).then((textContent) => {
+                            pdfjsLib.renderTextLayer({
+                                textContent: textContent,
+                                container: textLayerDiv,
+                                viewport: viewport,
+                                textDivs: []
+                            });
+
+                            pageRendering = false;
+                            if (pageNumPending !== null) {
+                                renderPage(pageNumPending);
+                                pageNumPending = null;
+                            }
+                        });
+                    });
+                    
+                    if (pageNumEl) pageNumEl.textContent = num;
+                    if (bookmarkBtn) {
+                        if(bookmarkedPages.includes(num)) {
+                           bookmarkBtn.classList.add('active');
+                        } else {
+                           bookmarkBtn.classList.remove('active');
+                        }
+                    }
+                }
+
+                function queueRenderPage(num) {
+                    if (pageRendering) {
+                        pageNumPending = num;
+                    } else {
+                        renderPage(num);
+                    }
+                }
+
+                document.getElementById('prev-page')?.addEventListener('click', () => {
+                    if (pageNum <= 1) return;
+                    pageNum--;
+                    queueRenderPage(pageNum);
+                });
+
+                document.getElementById('next-page')?.addEventListener('click', () => {
+                    if (pageNum >= pdfDoc.numPages) return;
+                    pageNum++;
+                    queueRenderPage(pageNum);
+                });
+                
+                if (bookmarkBtn) {
+                    bookmarkBtn.addEventListener('click', () => {
+                        const index = bookmarkedPages.indexOf(pageNum);
+                        if (index > -1) {
+                            bookmarkedPages.splice(index, 1);
+                            showToast(`Закладку на сторінці ${pageNum} видалено`);
+                        } else {
+                            bookmarkedPages.push(pageNum);
+                            showToast(`Закладку на сторінці ${pageNum} додано`);
+                        }
+                        sessionStorage.setItem(`bookmarks_${bookId}`, JSON.stringify(bookmarkedPages));
+                        bookmarkBtn.classList.toggle('active', bookmarkedPages.includes(pageNum));
+                    });
+                }
+
+                pdfjsLib.getDocument(book.filePathPDF).promise.then(function(pdfDoc_) {
+                    pdfDoc = pdfDoc_;
+                    if (pageCountEl) pageCountEl.textContent = pdfDoc.numPages;
+                    if (loader) loader.style.display = 'none';
+                    renderPage(pageNum);
+                }).catch(function(error) {
+                    console.error('Error loading PDF:', error);
+                    if (loader) loader.textContent = 'Помилка завантаження PDF-файлу.';
+                });
+
+            } else {
+                if (loader) loader.textContent = 'Помилка: файл книги не знайдено.';
             }
         }
     }
