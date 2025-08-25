@@ -1,0 +1,10 @@
+adventuretime.mult-fan.tv
+adguard.adun.cc
+portainer.adun.cc
+sillytavern.adun.cc
+proxmox.adun.cc
+vaultwarden.adun.cc
+homeassistant.adun.cc
+adguard.adun.cc
+nginx.adun.cc
+uptimekuma.adun.cc
